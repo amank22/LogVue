@@ -17,7 +17,6 @@ import processor.FlinkProcessor
 import storage.Db
 import ui.AppTheme
 import ui.CustomTheme
-import ui.LocalCustomColors
 import ui.components.BodyPanel
 import ui.components.SideNavigation
 import utils.Helpers
@@ -31,7 +30,7 @@ fun App() {
     val processor = remember { FlinkProcessor(packageName) }
     val isLightTheme by Helpers.isThemeLightMode.collectAsState()
     AppTheme(isLightTheme) {
-        Row(Modifier.fillMaxSize().background(LocalCustomColors.current.background)) {
+        Row(Modifier.fillMaxSize().background(CustomTheme.colors.background)) {
             var sessionId by remember { mutableStateOf(Db.sessionId()) }
             SideNavigation(
                 processor, sessionId, Modifier.fillMaxHeight().weight(0.2f)
