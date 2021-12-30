@@ -1,12 +1,13 @@
 package processor
 
-import inputs.adb.LogCatErrors
 import inputs.adb.AndroidLogStreamer
+import inputs.adb.LogCatErrors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import models.LogItem
+import models.SessionInfo
 import storage.Db
 import utils.Helpers
 import utils.Log
@@ -22,14 +23,16 @@ class MainProcessor {
         Db.getAllSessions().asReversed()
     }
 
+    fun getSessionInfo(sessionId: String) = Db.getSessionInfo(sessionId)
+
     fun startOldSession(session: String) {
         pause()
         Db.changeSession(session)
     }
 
-    fun createNewSession() {
+    fun createNewSession(sessionInfo: SessionInfo) {
         pause()
-        Db.createNewSession()
+        Db.createNewSession(sessionInfo)
     }
 
     fun deleteSession(sessionId: String) {
@@ -42,12 +45,12 @@ class MainProcessor {
     fun getCurrentSessionId() = Db.sessionId()
 
     suspend fun fetchOldStream(onMessage: (msg: List<LogItem>) -> Unit) = withContext(Dispatchers.IO) {
-        val lastItems = Db.currentSession().filter {
+        val lastItems = Db.currentSession()?.filter {
             val value = it.value
             Db.parameterSet.addAll(value.properties.keys)
             paramFilter.filter(value)
-        }.map { it.value }.sortedBy { it.localTime }
-        if (lastItems.isNotEmpty()) {
+        }?.map { it.value }?.sortedBy { it.localTime }
+        if (!lastItems.isNullOrEmpty()) {
             uiFlowSink(flowOf(lastItems), onMessage)
         } else {
             onMessage(listOf(LogItem.NoContent))

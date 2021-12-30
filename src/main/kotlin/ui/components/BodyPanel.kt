@@ -32,7 +32,7 @@ import ui.CustomTheme
 @Composable
 fun BodyPanel(
     processor: MainProcessor,
-    sessionId: String,
+    sessionId: String?,
     modifier: Modifier = Modifier
 ) {
     val logItems = remember(sessionId) { mutableStateListOf<LogItem>() }
@@ -46,7 +46,7 @@ fun BodyPanel(
         var actionMenuItems by remember(sessionId) { mutableStateOf(ActionMenu.DefaultList) }
         val currentDevice by Devices.currentDeviceFlow.collectAsState()
         var errorString by remember(currentDevice) {
-            mutableStateOf(if (currentDevice.isNullOrBlank()) "No device is connected" else "")
+            mutableStateOf(if (currentDevice == null) "No device is connected" else "")
         }
         val onNewMessage: (msg: List<LogItem>) -> Unit = { msg ->
             paramItems = Db.parameterSet.toList().sorted()
@@ -95,16 +95,18 @@ fun BodyPanel(
         if (errorString.isNotBlank()) {
             ErrorBar(errorString)
         }
-        ActionBarMenu(actionMenuItems, {
-            streamData(processor, scope, onError, onNewMessage)
-            actionMenuItems = ActionMenu.PauseList
-            streamRunning = true
-            errorString = ""
-        }, {
-            pauseProcessor(processor)
-            actionMenuItems = ActionMenu.DefaultList
-            streamRunning = false
-        })
+        if (!sessionId.isNullOrBlank()) {
+            ActionBarMenu(actionMenuItems, {
+                streamData(processor, scope, onError, onNewMessage)
+                actionMenuItems = ActionMenu.PauseList
+                streamRunning = true
+                errorString = ""
+            }, {
+                pauseProcessor(processor)
+                actionMenuItems = ActionMenu.DefaultList
+                streamRunning = false
+            })
+        }
         Text(
             "Analytics Logs", Modifier.padding(24.dp),
             style = CustomTheme.typography.headings.h3
@@ -137,7 +139,7 @@ private fun ErrorBar(errorString: String) {
 private fun MainBodyContent(
     logItems: SnapshotStateList<LogItem>, modifier: Modifier = Modifier,
     streamRunning: Boolean = false,
-    sessionId: String,
+    sessionId: String?,
     state: LazyListState
 ) {
     val lastIndex = (logItems.size - 1).coerceAtLeast(0)
@@ -156,6 +158,7 @@ private fun MainBodyContent(
                 selectedItem,
                 Modifier.fillMaxHeight().weight(0.4f)
             ) {
+                selectedItem?.isSelected = false
                 selectedItem = null
             }
         }

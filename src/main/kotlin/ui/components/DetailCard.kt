@@ -54,7 +54,7 @@ fun DetailCardEmpty() {
     ) {
         // show empty state
         Image(
-            painterResource("icons/waiting_illustration.webp"),
+            painterResource("icons/waiting.svg"),
             "Select log",
             Modifier.fillMaxWidth(0.6f).graphicsLayer { rotationY = 180f },
             contentScale = ContentScale.FillWidth

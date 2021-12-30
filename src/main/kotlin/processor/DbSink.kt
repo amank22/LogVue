@@ -8,8 +8,9 @@ import storage.Db
 object DbSink {
 
     fun save(value: LogItem?) {
-        if (value == null || value.source is SourceInternalContent) return
-        Db.currentSession()[value.key()] = value
+        val currentSession = Db.currentSession()
+        if (value == null || value.source is SourceInternalContent || currentSession == null) return
+        currentSession[value.key()] = value
     }
 
     fun saveAll(list: List<LogItem>) {
@@ -22,6 +23,7 @@ object DbSink {
 
     fun saveAll(value: Map<String, LogItem?>) {
         val filteredMap = value.filterValues { it != null && it.source !is SourceInternalContent }
-        Db.currentSession().putAll(filteredMap)
+        val currentSession = Db.currentSession() ?: return
+        currentSession.putAll(filteredMap)
     }
 }

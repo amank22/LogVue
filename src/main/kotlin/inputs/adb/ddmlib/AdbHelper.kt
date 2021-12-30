@@ -6,6 +6,7 @@ import com.android.ddmlib.IDevice
 import com.android.ddmlib.Log
 import inputs.adb.LogErrorDeviceNotConnected
 import inputs.adb.LogErrorPackageIssue
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import models.LogCatMessage2
 import utils.Either
 import java.io.File
@@ -23,7 +25,7 @@ import kotlin.concurrent.thread
 object AdbHelper {
 
     private var bridge: AndroidDebugBridge? = null
-    private const val PACKAGES_COMMAND = "pm list packages"
+    private const val PACKAGES_COMMAND = "pm list packages -3 -e"
     // list of lines with format : package:com.ea.games.r3_row
 
     fun init() {
@@ -47,7 +49,7 @@ object AdbHelper {
     fun close() {
         try {
             AndroidDebugBridge.terminate()
-        } catch (e : Exception) {
+        } catch (e: Exception) {
             // ignore
         }
     }
@@ -105,6 +107,13 @@ object AdbHelper {
 
     fun closeLogs() {
         stopLogs = true
+    }
+
+    suspend fun getPackages(device: IDevice, onValue: (packages: List<String>) -> Unit) = withContext(Dispatchers.IO) {
+        device.executeShellCommand(
+            PACKAGES_COMMAND, PackagesReceiver(onValue),
+            10, TimeUnit.SECONDS
+        )
     }
 
     private fun IDevice.emptyShellCommand(command: String) {

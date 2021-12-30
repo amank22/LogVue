@@ -14,7 +14,8 @@ class Devices : AndroidDebugBridge.IDeviceChangeListener {
         private val _currentDeviceFlow: MutableStateFlow<DeviceDetails2?> = MutableStateFlow(null)
 
         val currentDeviceFlow = _currentDeviceFlow
-        val currentDevice = currentDeviceFlow.value
+        val currentDevice
+            get() = currentDeviceFlow.value
 
         fun setCurrentDevice(serial: DeviceDetails2?) {
             _currentDeviceFlow.value = serial

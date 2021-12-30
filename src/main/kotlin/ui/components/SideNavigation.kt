@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,8 +26,8 @@ import ui.CustomTheme
 
 @Composable
 fun SideNavigation(
-    processor: MainProcessor, sessionId: String, modifier: Modifier = Modifier,
-    onSessionChange: (sessionId: String) -> Unit
+    processor: MainProcessor, sessionId: String?, modifier: Modifier = Modifier,
+    onSessionChange: (sessionId: String?) -> Unit
 ) {
     var sessions by remember { mutableStateOf<List<String>>(arrayListOf()) }
     val scope = rememberCoroutineScope()
@@ -39,17 +40,17 @@ fun SideNavigation(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Image(painterResource("icons/logo.png"), "goFlog", Modifier.size(40.dp))
-            Text("GoFlog", fontSize = 16.sp)
+            Text("GoFlog", fontSize = 18.sp)
         }
         Text(
             "Sessions", Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
             style = CustomTheme.typography.headings.h3
         )
+        var createSessionBoxShown by remember { mutableStateOf(false) }
 
         Button(
             {
-                processor.createNewSession()
-                onSessionChange(processor.getCurrentSessionId())
+                createSessionBoxShown = true
             }, Modifier.fillMaxWidth(0.8f), elevation = ButtonDefaults.elevation(0.dp),
             shape = RoundedCornerShape(0, 50, 50, 0)
         ) {
@@ -58,10 +59,31 @@ fun SideNavigation(
                 Text("Start New Session", color = contentColorFor(MaterialTheme.colors.primary))
             }
         }
+        if (createSessionBoxShown) {
+            NewSessionBox({ createSessionBoxShown = false }) {
+                processor.createNewSession(it)
+                createSessionBoxShown = false
+                onSessionChange(processor.getCurrentSessionId())
+            }
+        }
 
-        SessionsList(sessions, processor, Modifier.fillMaxHeight(0.5f).padding(vertical = 16.dp), onSessionChange) {
-            scope.launch {
-                sessions = processor.getSessions()
+        if (sessions.isEmpty()) {
+            val painter = painterResource("icons/ic_illustration_new_session.xml")
+            Image(
+                painter,
+                "Start New session",
+                Modifier.fillMaxWidth(0.8f).padding(start = 16.dp, end = 16.dp, top = 16.dp),
+                contentScale = ContentScale.FillWidth
+            )
+            Text(
+                "Create a new session to get started",
+                Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+            )
+        } else {
+            SessionsList(sessions, processor, Modifier.fillMaxHeight(0.5f).padding(vertical = 16.dp), onSessionChange) {
+                scope.launch {
+                    sessions = processor.getSessions()
+                }
             }
         }
 
@@ -96,7 +118,7 @@ private fun DeviceList(modifier: Modifier = Modifier) {
             var modifier1 = Modifier.clip(shape).clickable {
                 Devices.setCurrentDevice(it)
             }.fillMaxWidth(0.8f)
-            if (it.serial == currentDeviceSelected) {
+            if (it == currentDeviceSelected) {
                 modifier1 = modifier1.background(
                     CustomTheme.colors.accent.copy(0.4f),
                     shape
@@ -121,18 +143,19 @@ private fun SessionsList(
     sessions: List<String>,
     processor: MainProcessor,
     modifier: Modifier = Modifier,
-    onSessionChange: (sessionId: String) -> Unit,
+    onSessionChange: (sessionId: String?) -> Unit,
     onSessionDelete: () -> Unit
 ) {
     LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         items(sessions, key = { item: String -> item }) {
+            val session = processor.getSessionInfo(it) ?: return@items
             val currentSession = processor.getCurrentSessionId()
             val shape = RoundedCornerShape(0, 50, 50, 0)
             val isThisCurrentSession = currentSession == it
             var modifier1 = Modifier.clip(shape).clickable {
                 processor.startOldSession(it)
                 onSessionChange(processor.getCurrentSessionId())
-            }.fillMaxWidth(0.8f)
+            }.fillMaxWidth(0.95f)
             if (isThisCurrentSession) {
                 modifier1 = modifier1.background(
                     CustomTheme.colors.accent.copy(0.4f),
@@ -140,13 +163,19 @@ private fun SessionsList(
                 )
             }
             modifier1 = modifier1.padding(start = 24.dp, top = 8.dp, bottom = 8.dp)
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(it, modifier1)
+            Row(
+                modifier1, verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(session.description)
+                    Text(session.appPackage, style = CustomTheme.typography.headings.caption)
+                }
                 IconButton({
                     processor.deleteSession(it)
                     onSessionDelete()
                 }) {
-                    Icon(painterResource("icons/ico_close.xml"), "delete session")
+                    Icon(painterResource("icons/ico-trashcan.svg"), "delete session")
                 }
             }
         }

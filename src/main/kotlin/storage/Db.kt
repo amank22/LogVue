@@ -1,9 +1,8 @@
 package storage
 
 import models.Filter
-import models.ItemSource
 import models.LogItem
-import models.SourceInternalContent
+import models.SessionInfo
 import org.mapdb.DBMaker
 import org.mapdb.HTreeMap
 import org.mapdb.Serializer
@@ -17,8 +16,8 @@ object Db {
         DBMaker.fileDB("sessions.db").fileMmapEnableIfSupported().checksumHeaderBypass().make()
     }
 
-    private lateinit var session: HTreeMap<String, LogItem>
-    private lateinit var sessionId: String
+    private var session: HTreeMap<String, LogItem>? = null
+    private var sessionId: String? = null
     private val LOCK = Any()
 
     private val filters by lazy {
@@ -36,25 +35,34 @@ object Db {
         db.hashMap("configs", Serializer.STRING, Serializer.STRING).createOrOpen()
     }
 
+    private val sessionInfoMap by lazy {
+        db.hashMap("sessionInfo", Serializer.STRING, ObjectSerializer<SessionInfo>()).createOrOpen()
+    }
+
     init {
-        if (areNoSessionsCreated()) {
-            createNewSession()
-        } else {
+        if (!areNoSessionsCreated()) {
             getOrCreateSession(getPreviousSessionNumber())
         }
     }
 
     fun getSessionFilters(): HashSet<Filter> {
-        return filters.getOrPut(sessionId()) { hashSetOf() }
+        if (sessionId() == null) return hashSetOf()
+        return filters[sessionId()] ?: hashSetOf()
+    }
+
+    fun getSessionInfo(sessionId: String): SessionInfo? {
+        return sessionInfoMap[sessionId]
     }
 
     fun addFilterInCurrentSession(filter: Filter) {
+        if (sessionId() == null) return
         val oldFilters = getSessionFilters()
         oldFilters.add(filter)
         filters[sessionId()] = oldFilters
     }
 
     fun deleteFilterInCurrentSession(filter: Filter) {
+        if (sessionId() == null) return
         val oldFilters = getSessionFilters()
         oldFilters.remove(filter)
         filters[sessionId()] = oldFilters
@@ -79,22 +87,33 @@ object Db {
 
     fun getSessionNumber(sessionId: String) = sessionId.split("-").lastOrNull()?.toIntOrNull() ?: 0
 
-    fun areNoSessionsCreated() = getLastSessionNumber() == 0
+    fun areNoSessionsCreated() = getAllSessions().isEmpty()
 
-    fun createNewSession() {
-        val sessionNumber = getLastSessionNumber()
-        changeSession(sessionIdFromNumber(sessionNumber + 1))
+    fun isThisTheOnlySession(sessionId: String): Boolean {
+        val sessions = getAllSessions()
+        if (sessions.size != 1) return false
+        return sessions.first() == sessionId
     }
 
-    fun deleteSession(sessionId : String) {
-        if (sessionId == sessionId()) {
+    fun createNewSession(sessionInfo: SessionInfo) {
+        val sessionNumber = getLastSessionNumber()
+        val sessionIdFromNumber = sessionIdFromNumber(sessionNumber + 1)
+        changeSession(sessionIdFromNumber)
+        sessionInfoMap[sessionIdFromNumber] = sessionInfo
+    }
+
+    fun deleteSession(sessionId: String) {
+        if (sessionId == sessionId() && !isThisTheOnlySession(sessionId)) {
             val sessionNumber = getLastSessionNumber()
             changeSession(sessionIdFromNumber(sessionNumber + 1))
+        } else if (sessionId == sessionId()) {
+            changeSession(null)
         }
         val oldSession = db.hashMap(sessionId, Serializer.STRING, ObjectSerializer<LogItem>())
             .open()
         oldSession.clear()
         filters.remove(sessionId)
+        sessionInfoMap.remove(sessionId)
         val recIds = arrayListOf<Long>()
         db.nameCatalogParamsFor(sessionId).forEach { (t, u) ->
             if (t.endsWith("rootRecids")) {
@@ -120,16 +139,25 @@ object Db {
         db.commit()
     }
 
-    fun changeSession(sessionId: String): HTreeMap<String, LogItem> {
-        val number = getSessionNumber(sessionId)
+    fun changeSession(sessionId: String?) {
         parameterSet.clear()
+        if (sessionId == null) {
+            getOrCreateSession(null)
+            return
+        }
+        val number = getSessionNumber(sessionId)
         getOrCreateSession(number)
-        return session
     }
 
-    fun getOrCreateSession(sessionNumber: Int) {
-        if (sessionNumber < 1) throw Exception("Session number must be greater than 1")
+    private fun getOrCreateSession(sessionNumber: Int?) {
         synchronized(LOCK) {
+            if (sessionNumber == null) {
+                this.sessionId = null
+                configs.remove("lastSessionId")
+                this.session = null
+                return
+            }
+            if (sessionNumber < 1) throw Exception("Session number must be greater than 1")
             val sessionId = sessionIdFromNumber(sessionNumber)
             val session = db
                 .hashMap(sessionId, Serializer.STRING, ObjectSerializer<LogItem>())

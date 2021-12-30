@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import ui.CustomTheme
 import ui.LocalCustomColors
@@ -20,20 +19,9 @@ fun Chip(
     bgColor: Color = LocalCustomColors.current.componentBackground,
     textColor: Color = LocalCustomColors.current.highContrast,
     addBorder: Boolean = false,
-    icon: @Composable (() -> Unit)? = null
-) {
-    Chip(AnnotatedString(text), modifier, bgColor, textColor, addBorder, icon)
-}
-
-@Composable
-fun Chip(
-    text: AnnotatedString, modifier: Modifier = Modifier,
-    bgColor: Color = LocalCustomColors.current.componentBackground,
-    textColor: Color = LocalCustomColors.current.highContrast,
-    addBorder: Boolean = false,
     icon: @Composable (() -> Unit)? = null,
 ) {
-    var modifier1 = modifier.wrapContentSize().background(bgColor, CustomTheme.shapes.small)
+    var modifier1 = modifier.background(bgColor, CustomTheme.shapes.small)
     if (addBorder) {
         modifier1 = modifier1
             .border((0.2).dp, textColor, CustomTheme.shapes.small)

@@ -72,3 +72,5 @@ outTmp/
 /test.output
 /kotlin-native/dist
 kotlin-ide/
+sessions.db
+filters

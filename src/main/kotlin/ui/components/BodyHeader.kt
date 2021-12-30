@@ -23,7 +23,7 @@ private val signList = FilterOperation.getOpList()
 
 @Composable
 fun BodyHeader(
-    sessionId: String, availableParams: List<String>, modifier: Modifier = Modifier,
+    sessionId: String?, availableParams: List<String>, modifier: Modifier = Modifier,
     filtersEnabled: Boolean = true,
     onFilterUpdated: () -> Unit
 ) {
@@ -62,7 +62,7 @@ fun BodyHeader(
 @Composable
 private fun FilterSearchHeader(
     modifier: Modifier,
-    sessionId: String,
+    sessionId: String?,
     filtersEnabled: Boolean,
     availableParams: List<String>,
     onFilterUpdated: () -> Unit

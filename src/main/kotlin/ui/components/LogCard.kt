@@ -12,13 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import models.LogItem
 import models.SourceFA
-import models.SourceInternalContent
 import ui.CustomTheme
 import ui.views.flow.FlowRow
 import utils.Helpers
@@ -107,7 +105,7 @@ private fun HorizontalFlow(properties: HashMap<String, Any>) {
                 if (takeValue.isBlank()) {
                     return@forEach
                 }
-                val text = AnnotatedString("$key : $takeValue")
+                val text = "$key : $takeValue"
                 Chip(
                     text,
                     bgColor = CustomTheme.colors.componentBackground2,

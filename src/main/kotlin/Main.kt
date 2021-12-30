@@ -38,7 +38,7 @@ fun App() {
                 processor, sessionId, Modifier.fillMaxHeight().weight(0.2f)
                     .background(CustomTheme.colors.componentBackground)
             ) {
-                sessionId = it
+                sessionId = it.orEmpty()
             }
             Divider(Modifier.fillMaxHeight().width(1.dp).background(Color.LightGray.copy(alpha = 0.3f)))
             BodyPanel(processor, sessionId, Modifier.fillMaxHeight().weight(0.8f))
@@ -71,8 +71,8 @@ private fun ParameterList(list: List<String>, modifier: Modifier) {
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
-fun main() = application {
-    fun onClose(source : String) {
+fun main() = application(false) {
+    fun onClose(source: String) {
         Log.d("QuitHandler", "Quiting : $source")
         AdbHelper.close()
         Db.close()
