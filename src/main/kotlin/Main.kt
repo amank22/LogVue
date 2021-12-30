@@ -8,12 +8,14 @@ import androidx.compose.foundation.window.WindowDraggableArea
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
-import processor.FlinkProcessor
+import inputs.adb.ddmlib.AdbHelper
+import processor.MainProcessor
 import storage.Db
 import ui.AppTheme
 import ui.CustomTheme
@@ -26,8 +28,8 @@ import java.awt.Desktop
 @Composable
 @Preview
 fun App() {
-    val packageName = "com.goibibo.debug"
-    val processor = remember { FlinkProcessor(packageName) }
+//    val packageName = "com.goibibo.debug"
+    val processor = remember { MainProcessor() }
     val isLightTheme by Helpers.isThemeLightMode.collectAsState()
     AppTheme(isLightTheme) {
         Row(Modifier.fillMaxSize().background(CustomTheme.colors.background)) {
@@ -40,6 +42,9 @@ fun App() {
             }
             Divider(Modifier.fillMaxHeight().width(1.dp).background(Color.LightGray.copy(alpha = 0.3f)))
             BodyPanel(processor, sessionId, Modifier.fillMaxHeight().weight(0.8f))
+        }
+        LaunchedEffect(Unit) {
+            AdbHelper.init()
         }
     }
 }
@@ -65,19 +70,26 @@ private fun ParameterList(list: List<String>, modifier: Modifier) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun main() = application {
-    Desktop.getDesktop().setQuitHandler { e, response ->
-        Log.d("QuitHandler", "Quiting : ${e.source}")
+    fun onClose(source : String) {
+        Log.d("QuitHandler", "Quiting : $source")
+        AdbHelper.close()
         Db.close()
+    }
+    Desktop.getDesktop().setQuitHandler { e, response ->
+        onClose(e.source.toString())
         response.performQuit()
     }
     val onCloseRequest = {
-        Log.d("QuitHandler", "Quiting : OnClose Request")
-        Db.close()
+        onClose("User Close")
         exitApplication()
     }
     val windowState = rememberWindowState(WindowPlacement.Floating, size = DpSize(1440.dp, 1024.dp))
     Window(onCloseRequest = onCloseRequest, title = "GoFlog", state = windowState) {
+//        window.exceptionHandler = WindowExceptionHandler {
+//            println(it)
+//        }
         App()
     }
 }

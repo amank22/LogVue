@@ -19,26 +19,26 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation(compose.desktop.currentOs)
-    // https://mvnrepository.com/artifact/org.apache.flink/flink-streaming-java
-    implementation("org.apache.flink:flink-streaming-java_2.12:1.14.0")
-    // https://mvnrepository.com/artifact/org.apache.flink/flink-clients
-    implementation("org.apache.flink:flink-clients_2.12:1.14.0")
     // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.16.0")
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.17.0")
+    implementation("org.apache.logging.log4j:log4j-api:2.17.0")
+    implementation("org.apache.logging.log4j:log4j-core:2.17.0")
+    // types parser for object to map conversion
     implementation("com.github.drapostolos:type-parser:0.7.0")
     // embedded database
     implementation("org.mapdb:mapdb:3.0.8")
     implementation("org.snakeyaml:snakeyaml-engine:2.3")
-    implementation ("com.malinskiy.adam:adam:0.4.3")
-    implementation("com.github.pgreze:kotlin-process:1.3.1")
+    // https://mvnrepository.com/artifact/io.netty/netty-resolver-dns-native-macos
+    runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.72.Final") // not sure if needed now
+    implementation("com.android.tools.ddms:ddmlib:30.2.0-alpha06")
 }
 
 tasks.test {
     useJUnit()
 }
 
-tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "11"
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 compose.desktop {

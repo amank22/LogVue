@@ -8,6 +8,7 @@ import androidx.compose.ui.text.withStyle
 import com.github.drapostolos.typeparser.GenericType
 import com.github.drapostolos.typeparser.TypeParser
 import kotlinx.coroutines.flow.MutableStateFlow
+import models.LogCatMessage2
 import models.LogItem
 import models.SourceFA
 import org.snakeyaml.engine.v2.api.Dump
@@ -29,14 +30,14 @@ object Helpers {
     private val settings = DumpSettings.builder().setDefaultScalarStyle(ScalarStyle.PLAIN)
         .build()
 
-    val isThemeLightMode = MutableStateFlow(Db.configs["isThemeLightMode"]?.toBooleanStrictOrNull()?:true)
+    val isThemeLightMode = MutableStateFlow(Db.configs["isThemeLightMode"]?.toBooleanStrictOrNull() ?: true)
 
-    fun switchThemes(isLightMode : Boolean) {
+    fun switchThemes(isLightMode: Boolean) {
         isThemeLightMode.value = isLightMode
         Db.configs["isThemeLightMode"] = isLightMode.toString()
     }
 
-    fun validateFALogString(rawText: String) : Boolean {
+    fun validateFALogString(rawText: String): Boolean {
         if (rawText.isBlank()) return false
 //        val firstIndexOfClose = rawText.indexOfFirst { it == ']' }
 //        if (firstIndexOfClose == -1) return false
@@ -45,7 +46,7 @@ object Helpers {
         return true
     }
 
-    fun cutLogString(rawText: String) : String {
+    fun cutLogString(rawText: String): String {
         val firstIndexOfClose = rawText.indexOfFirst { it == ']' }
         val trim = rawText.substring(firstIndexOfClose + 1).trim()
 //        println("trimmed : $trim")
@@ -55,7 +56,8 @@ object Helpers {
     /*
     * Sample: Passing event to registered event handler (FE): lumos_home, Bundle[{analytics={request_id=a85e6056-448b-4bb3-beaf-14c2550d7499}, templateName=vaccination, screenName=home_notloggedin, utm_campaign=GI_VACCINATION_V2_LOW_B2C_IN_DEF, cardName=GI_VACCINATION_V2_LOW_B2C_IN_DEF, ga_screen_class(_sc)=HomeActivity, ga_screen_id(_si)=5665805600968775538, home=skywalker_v1, type=cardViewed, request_id=a85e6056-448b-4bb3-beaf-14c2550d7499}]
     */
-    fun parseFALogs(rawText: String): LogItem {
+    fun parseFALogs(msg: LogCatMessage2): LogItem {
+        val rawText = msg.message
         val cut1 = rawText.removePrefix(faPrefix)
         val eventParamsCutter = cut1.split(Regex(","), 2)
         val eventName = eventParamsCutter[0].trim()
@@ -66,7 +68,8 @@ object Helpers {
             properties.putAll(something)
             Db.parameterSet.addAll(properties.keys)
         }
-        return LogItem(SourceFA, eventName, properties)
+        val time = msg.header.timestamp.toEpochMilli()
+        return LogItem(source = SourceFA, eventName = eventName, properties = properties, localTime = time)
     }
 
     fun tryParseToType(str: String?): Any? {

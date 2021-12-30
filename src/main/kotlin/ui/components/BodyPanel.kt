@@ -20,17 +20,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import inputs.adb.*
+import inputs.adb.ddmlib.Devices
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import models.LogItem
 import models.SourceInternalContent
-import processor.FlinkProcessor
+import processor.MainProcessor
 import storage.Db
 import ui.CustomTheme
 
 @Composable
 fun BodyPanel(
-    processor: FlinkProcessor,
+    processor: MainProcessor,
     sessionId: String,
     modifier: Modifier = Modifier
 ) {
@@ -43,13 +44,13 @@ fun BodyPanel(
             LazyListState()
         }
         var actionMenuItems by remember(sessionId) { mutableStateOf(ActionMenu.DefaultList) }
-        val currentDevice by AdbUtils.currentDeviceFlow.collectAsState()
+        val currentDevice by Devices.currentDeviceFlow.collectAsState()
         var errorString by remember(currentDevice) {
             mutableStateOf(if (currentDevice.isNullOrBlank()) "No device is connected" else "")
         }
-        val onNewMessage: (msg: LogItem) -> Unit = { msg ->
+        val onNewMessage: (msg: List<LogItem>) -> Unit = { msg ->
             paramItems = Db.parameterSet.toList().sorted()
-            logItems.add(msg)
+            logItems.addAll(msg)
         }
         val onError: (logError: LogCatErrors) -> Unit = {
             actionMenuItems = ActionMenu.DefaultList
@@ -255,8 +256,8 @@ private fun PortalToTopButton(state: LazyListState, lastIndex: Int, modifier: Mo
 }
 
 private fun streamData(
-    processor: FlinkProcessor, scope: CoroutineScope,
-    onError: (logError: LogCatErrors) -> Unit, onMessage: (msg: LogItem) -> Unit
+    processor: MainProcessor, scope: CoroutineScope,
+    onError: (logError: LogCatErrors) -> Unit, onMessage: (msg: List<LogItem>) -> Unit
 ) {
     scope.launch {
         processor.observeNewStream(onError) { msg ->
@@ -266,7 +267,7 @@ private fun streamData(
     }
 }
 
-private fun fetchOldData(processor: FlinkProcessor, scope: CoroutineScope, onMessage: (msg: LogItem) -> Unit) {
+private fun fetchOldData(processor: MainProcessor, scope: CoroutineScope, onMessage: (msg: List<LogItem>) -> Unit) {
     scope.launch {
         processor.fetchOldStream { msg ->
 //                    Log.d("Got Message" , msg)
@@ -275,7 +276,7 @@ private fun fetchOldData(processor: FlinkProcessor, scope: CoroutineScope, onMes
     }
 }
 
-private fun pauseProcessor(processor: FlinkProcessor) {
+private fun pauseProcessor(processor: MainProcessor) {
     try {
         processor.pause()
     } catch (ex: CancelException) {

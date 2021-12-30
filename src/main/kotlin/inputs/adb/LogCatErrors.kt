@@ -1,6 +1,12 @@
 package inputs.adb
 
-sealed class LogCatErrors : Exception()
+import java.io.Serializable
+
+sealed class LogCatErrors : Exception(),Serializable {
+    companion object {
+        private const val serialVersionUID = 1L
+    }
+}
 object LogErrorNotEnabledForFA : LogCatErrors()
 object LogErrorDeviceNotConnected : LogCatErrors()
 object LogErrorPackageIssue : LogCatErrors()

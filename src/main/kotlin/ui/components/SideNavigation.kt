@@ -16,15 +16,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import inputs.adb.AdbUtils
+import inputs.adb.ddmlib.Devices
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import models.DeviceDetails
-import processor.FlinkProcessor
+import models.DeviceDetails2
+import processor.MainProcessor
 import ui.CustomTheme
 
 @Composable
 fun SideNavigation(
-    processor: FlinkProcessor, sessionId: String, modifier: Modifier = Modifier,
+    processor: MainProcessor, sessionId: String, modifier: Modifier = Modifier,
     onSessionChange: (sessionId: String) -> Unit
 ) {
     var sessions by remember { mutableStateOf<List<String>>(arrayListOf()) }
@@ -77,23 +78,23 @@ fun SideNavigation(
 
 @Composable
 private fun DeviceList(modifier: Modifier = Modifier) {
-    val scope = rememberCoroutineScope()
-    val devices by AdbUtils.monitorDevices(scope).collectAsState(emptyList())
-    val currentDeviceSelected by AdbUtils.currentDeviceFlow.collectAsState()
+    val scope = rememberCoroutineScope { Dispatchers.IO }
+    val devices by Devices.devicesFlow.collectAsState()
+    val currentDeviceSelected by Devices.currentDeviceFlow.collectAsState()
     if (devices.isEmpty()) {
         scope.launch {
-            AdbUtils.setCurrentDevice(null)
+            Devices.setCurrentDevice(null)
         }
     } else if (devices.size == 1) {
         scope.launch {
-            AdbUtils.setCurrentDevice(devices.first().serial)
+            Devices.setCurrentDevice(devices.first())
         }
     }
     LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(devices, { item: DeviceDetails -> item.serial }) {
+        items(devices, { item: DeviceDetails2 -> item.serial }) {
             val shape = RoundedCornerShape(0, 50, 50, 0)
             var modifier1 = Modifier.clip(shape).clickable {
-                AdbUtils.setCurrentDevice(it.serial)
+                Devices.setCurrentDevice(it)
             }.fillMaxWidth(0.8f)
             if (it.serial == currentDeviceSelected) {
                 modifier1 = modifier1.background(
@@ -101,7 +102,7 @@ private fun DeviceList(modifier: Modifier = Modifier) {
                     shape
                 )
             }
-            modifier1 = modifier1.padding(start = 24.dp, top = 8.dp, bottom = 8.dp)
+            modifier1 = modifier1.padding(start = 24.dp, top = 8.dp, bottom = 8.dp, end = 4.dp)
             val stateColor = if (it.isOnline()) {
                 CustomTheme.colors.alertColors.success
             } else {
@@ -118,7 +119,7 @@ private fun DeviceList(modifier: Modifier = Modifier) {
 @Composable
 private fun SessionsList(
     sessions: List<String>,
-    processor: FlinkProcessor,
+    processor: MainProcessor,
     modifier: Modifier = Modifier,
     onSessionChange: (sessionId: String) -> Unit,
     onSessionDelete: () -> Unit

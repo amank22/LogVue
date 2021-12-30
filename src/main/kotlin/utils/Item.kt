@@ -1,7 +1,7 @@
 package utils
 
-import org.apache.flink.shaded.guava30.com.google.common.base.Joiner
-import org.apache.flink.shaded.guava30.com.google.common.base.Splitter
+import com.google.common.base.Joiner
+import com.google.common.base.Splitter
 import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.regex.Pattern
@@ -87,7 +87,7 @@ abstract class Item(val stringRepresentation: String?) {
     }
 
     init {
-        LOGGER.info("creating: $stringRepresentation")
+//        LOGGER.info("creating: $stringRepresentation")
     }
 
     override fun toString(): String {
