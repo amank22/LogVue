@@ -9,6 +9,7 @@ sealed class LogCatErrors : Exception(),Serializable {
 }
 object LogErrorNotEnabledForFA : LogCatErrors()
 object LogErrorDeviceNotConnected : LogCatErrors()
+object LogErrorNoSession : LogCatErrors()
 object LogErrorPackageIssue : LogCatErrors()
 object LogErrorADBIssue : LogCatErrors()
 class LogErrorUnknown(val exception: Exception = Exception()) : LogCatErrors() {

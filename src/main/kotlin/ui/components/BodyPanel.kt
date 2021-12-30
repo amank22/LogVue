@@ -62,6 +62,9 @@ fun BodyPanel(
                 is LogErrorDeviceNotConnected -> {
                     "Please connect your device or start an emulator"
                 }
+                is LogErrorNoSession -> {
+                    "Create a new session to start logging data"
+                }
                 is LogErrorNotEnabledForFA -> {
                     "Unable to enable logs for firebase"
                 }

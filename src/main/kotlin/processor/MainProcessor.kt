@@ -2,6 +2,7 @@ package processor
 
 import inputs.adb.AndroidLogStreamer
 import inputs.adb.LogCatErrors
+import inputs.adb.LogErrorNoSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -61,7 +62,17 @@ class MainProcessor {
         onError: (logError: LogCatErrors) -> Unit,
         onMessage: (msg: List<LogItem>) -> Unit
     ) = withContext(Dispatchers.IO) {
-        val packageName = "com.goibibo.debug"
+        val sessionId = getCurrentSessionId()
+        if (sessionId == null) {
+            onError(LogErrorNoSession)
+            return@withContext
+        }
+        val sessionInfo = getSessionInfo(sessionId)
+        if (sessionInfo == null) {
+            onError(LogErrorNoSession)
+            return@withContext
+        }
+        val packageName = sessionInfo.appPackage
         val stream = streamer.stream(packageName)
         launch {
             val successStream = stream.filter { it.isSuccess }.map { it.getOrNull() }

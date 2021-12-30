@@ -10,9 +10,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -138,6 +140,7 @@ private fun DeviceList(modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun SessionsList(
     sessions: List<String>,
@@ -152,10 +155,20 @@ private fun SessionsList(
             val currentSession = processor.getCurrentSessionId()
             val shape = RoundedCornerShape(0, 50, 50, 0)
             val isThisCurrentSession = currentSession == it
-            var modifier1 = Modifier.clip(shape).clickable {
-                processor.startOldSession(it)
-                onSessionChange(processor.getCurrentSessionId())
-            }.fillMaxWidth(0.95f)
+            var showDeleteIcon by remember(it) { mutableStateOf(false) }
+            var modifier1 = Modifier
+                .clip(shape)
+                .pointerMoveFilter(onEnter = {
+                    showDeleteIcon = true
+                    false
+                }, onExit = {
+                    showDeleteIcon = false
+                    false
+                })
+                .clickable {
+                    processor.startOldSession(it)
+                    onSessionChange(processor.getCurrentSessionId())
+                }.fillMaxWidth(0.95f)
             if (isThisCurrentSession) {
                 modifier1 = modifier1.background(
                     CustomTheme.colors.accent.copy(0.4f),
@@ -167,15 +180,17 @@ private fun SessionsList(
                 modifier1, verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column {
-                    Text(session.description)
-                    Text(session.appPackage, style = CustomTheme.typography.headings.caption)
+                Column(Modifier.height(36.dp), Arrangement.Center) {
+                    Text(session.description, maxLines = 1)
+                    Text(session.appPackage, style = CustomTheme.typography.headings.caption, maxLines = 1)
                 }
-                IconButton({
-                    processor.deleteSession(it)
-                    onSessionDelete()
-                }) {
-                    Icon(painterResource("icons/ico-trashcan.svg"), "delete session")
+                if (showDeleteIcon) {
+                    IconButton({
+                        processor.deleteSession(it)
+                        onSessionDelete()
+                    }, Modifier.size(36.dp).padding(end = 16.dp)) {
+                        Icon(painterResource("icons/ico-trashcan.svg"), "delete session")
+                    }
                 }
             }
         }
