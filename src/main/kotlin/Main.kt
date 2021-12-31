@@ -21,6 +21,7 @@ import ui.AppTheme
 import ui.CustomTheme
 import ui.components.BodyPanel
 import ui.components.SideNavigation
+import utils.APP_NAME
 import utils.Helpers
 import utils.Log
 import java.awt.Desktop
@@ -86,7 +87,7 @@ fun main() = application(false) {
         exitApplication()
     }
     val windowState = rememberWindowState(WindowPlacement.Floating, size = DpSize(1440.dp, 1024.dp))
-    Window(onCloseRequest = onCloseRequest, title = "GoFlog", state = windowState) {
+    Window(onCloseRequest = onCloseRequest, title = APP_NAME, state = windowState) {
 //        window.exceptionHandler = WindowExceptionHandler {
 //            println(it)
 //        }
