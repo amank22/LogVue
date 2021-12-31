@@ -13,8 +13,14 @@ import models.LogItem
 import models.SourceFA
 import org.snakeyaml.engine.v2.api.Dump
 import org.snakeyaml.engine.v2.api.DumpSettings
+import org.snakeyaml.engine.v2.api.StreamDataWriter
 import org.snakeyaml.engine.v2.common.ScalarStyle
+import processor.YamlWriter
 import storage.Db
+import java.io.PrintWriter
+import java.nio.file.Path
+import java.util.*
+import kotlin.io.path.absolutePathString
 
 
 object Helpers {
@@ -27,8 +33,10 @@ object Helpers {
 
     private val parser = TypeParser.newBuilder().build()
 
-    private val settings = DumpSettings.builder().setDefaultScalarStyle(ScalarStyle.PLAIN)
-        .build()
+    private val settings by lazy {
+        DumpSettings.builder().setDefaultScalarStyle(ScalarStyle.PLAIN)
+            .build()
+    }
 
     val isThemeLightMode = MutableStateFlow(Db.configs["isThemeLightMode"]?.toBooleanStrictOrNull() ?: true)
 
@@ -176,13 +184,21 @@ object Helpers {
         }
     }
 
-    fun convertToYaml(properties: HashMap<String, Any>): String? {
-        return try {
+    fun convertToYaml(properties: HashMap<String, Any>, printWriter: PrintWriter) {
+        try {
             val dump = Dump(settings)
-            dump.dumpToString(properties)
+            dump.dump(properties, YamlWriter(printWriter))
         } catch (e: Exception) {
             Log.d("YamlConverter", e.localizedMessage)
-            null
+        }
+    }
+
+    fun convertToYaml(properties: HashMap<String, Any>, streamDataWriter: StreamDataWriter) {
+        try {
+            val dump = Dump(settings)
+            dump.dump(properties, streamDataWriter)
+        } catch (e: Exception) {
+            Log.d("YamlConverter", e.localizedMessage)
         }
     }
 
@@ -253,6 +269,26 @@ object Helpers {
             }
         }
         return takeValue
+    }
+
+    fun isWindows(): Boolean {
+        val os = System.getProperty("os.name").lowercase(Locale.getDefault())
+        // windows
+        return os.indexOf("win") >= 0
+    }
+
+    fun openFileExplorer(path: Path) {
+        try {
+            val pathString = path.absolutePathString()
+            val command = if (isWindows()) {
+                "Explorer.exe $pathString"
+            } else {
+                "open $pathString"
+            }
+            Runtime.getRuntime().exec(command)
+        } catch (e: Exception) {
+            Log.d("failed to open file manager")
+        }
     }
 
 }

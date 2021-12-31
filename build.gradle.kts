@@ -31,6 +31,7 @@ dependencies {
     // https://mvnrepository.com/artifact/io.netty/netty-resolver-dns-native-macos
     runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.72.Final") // not sure if needed now
     implementation("com.android.tools.ddms:ddmlib:30.2.0-alpha06")
+    implementation("com.google.code.gson:gson:2.8.9")
 }
 
 tasks.test {

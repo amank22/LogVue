@@ -98,17 +98,40 @@ fun BodyPanel(
         if (errorString.isNotBlank()) {
             ErrorBar(errorString)
         }
+        var isOpen by remember { mutableStateOf(false) }
+//        var showLoader by remember { mutableStateOf(false) }
+//        if (showLoader) {
+//            StyledCustomVerticalDialog({}) {
+//                CircularProgressIndicator(Modifier.align(Alignment.Center))
+//            }
+//        }
+        if (isOpen) {
+            val sessionInfo = processor.getSessionInfo(sessionId.orEmpty())
+            if (sessionInfo != null) {
+                ExportDialog(sessionInfo, logItems) {
+                    isOpen = false
+                }
+            }
+        }
         if (!sessionId.isNullOrBlank()) {
-            ActionBarMenu(actionMenuItems, {
-                streamData(processor, scope, onError, onNewMessage)
-                actionMenuItems = ActionMenu.PauseList
-                streamRunning = true
-                errorString = ""
-            }, {
-                pauseProcessor(processor)
-                actionMenuItems = ActionMenu.DefaultList
-                streamRunning = false
-            })
+            ActionBarMenu(actionMenuItems) {
+                when (it) {
+                    ActionExport -> {
+                        isOpen = true
+                    }
+                    ActionPause -> {
+                        pauseProcessor(processor)
+                        actionMenuItems = ActionMenu.DefaultList
+                        streamRunning = false
+                    }
+                    ActionStart -> {
+                        streamData(processor, scope, onError, onNewMessage)
+                        actionMenuItems = ActionMenu.PauseList
+                        streamRunning = true
+                        errorString = ""
+                    }
+                }
+            }
         }
         Text(
             "Analytics Logs", Modifier.padding(24.dp),
@@ -224,24 +247,12 @@ fun LoadingAnimation(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ActionBarMenu(actionMenuItems: List<ActionMenu>, onStreamStart: () -> Unit, onStreamPause: () -> Unit) {
+private fun ActionBarMenu(actionMenuItems: List<ActionMenu>, onMenuClick: (action: ActionMenu) -> Unit) {
     ActionBar(
         actionMenuItems, Modifier.fillMaxWidth()
             .background(CustomTheme.colors.componentBackground)
-            .padding(horizontal = 24.dp, vertical = 8.dp)
-    ) {
-        when (it) {
-            ActionExport -> {
-                // TODO: Export action
-            }
-            ActionPause -> {
-                onStreamPause()
-            }
-            ActionStart -> {
-                onStreamStart()
-            }
-        }
-    }
+            .padding(horizontal = 24.dp, vertical = 8.dp), onMenuClick
+    )
 }
 
 @Composable
