@@ -32,6 +32,9 @@ dependencies {
     runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.72.Final") // not sure if needed now
     implementation("com.android.tools.ddms:ddmlib:30.2.0-alpha06")
     implementation("com.google.code.gson:gson:2.8.9")
+    // https://mvnrepository.com/artifact/com.googlecode.cqengine/cqengine
+    implementation("com.googlecode.cqengine:cqengine:3.6.0")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
 }
 
 tasks.test {

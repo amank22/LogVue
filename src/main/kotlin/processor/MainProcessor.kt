@@ -15,10 +15,11 @@ import utils.Log
 import utils.failureOrNull
 import utils.getOrNull
 
+
 class MainProcessor {
 
     private val streamer = AndroidLogStreamer()
-    private val paramFilter = ParamFilter()
+    private var filterQuery: String? = null
 
     suspend fun getSessions() = withContext(Dispatchers.IO) {
         Db.getAllSessions().asReversed()
@@ -26,37 +27,41 @@ class MainProcessor {
 
     fun getSessionInfo(sessionId: String) = Db.getSessionInfo(sessionId)
 
+    fun isSameSession(sessionId: String) = sessionId == getCurrentSessionId()
+
     fun startOldSession(session: String) {
         pause()
+        filterQuery = null
         Db.changeSession(session)
     }
 
     fun createNewSession(sessionInfo: SessionInfo) {
         pause()
+        filterQuery = null
         Db.createNewSession(sessionInfo)
     }
 
     fun deleteSession(sessionId: String) {
         if (sessionId == getCurrentSessionId()) {
             pause()
+            filterQuery = null
         }
         Db.deleteSession(sessionId)
     }
 
     fun getCurrentSessionId() = Db.sessionId()
 
-    suspend fun fetchOldStream(onMessage: (msg: List<LogItem>) -> Unit) = withContext(Dispatchers.IO) {
-        val lastItems = Db.currentSession()?.filter {
-            val value = it.value
-            Db.parameterSet.addAll(value.properties.keys)
-            paramFilter.filter(value)
-        }?.map { it.value }?.sortedBy { it.localTime }
-        if (!lastItems.isNullOrEmpty()) {
-            uiFlowSink(flowOf(lastItems), onMessage)
-        } else {
-            onMessage(listOf(LogItem.NoContent))
+    suspend fun fetchOldStream(filterQuery: String? = null, onMessage: (msg: List<LogItem>) -> Unit) =
+        withContext(Dispatchers.IO) {
+            this@MainProcessor.filterQuery = filterQuery
+            val lastItems = Db.currentSession()
+                ?.map { it.value }
+            if (!lastItems.isNullOrEmpty()) {
+                uiFlowSink(flowOf(lastItems), false, onMessage)
+            } else {
+                onMessage(listOf(LogItem.noContent("Record logs using the start button above")))
+            }
         }
-    }
 
     suspend fun observeNewStream(
         onError: (logError: LogCatErrors) -> Unit,
@@ -85,7 +90,7 @@ class MainProcessor {
                     }
                 }.buffer()
             launch {
-                uiFlowSink(successStream, onMessage)
+                uiFlowSink(successStream, true, onMessage)
             }
             launch {
                 successStream.collect { list ->
@@ -101,11 +106,29 @@ class MainProcessor {
         }
     }
 
-    private suspend fun uiFlowSink(logItemStream: Flow<List<LogItem>>, onMessage: (msg: List<LogItem>) -> Unit) {
-        logItemStream
-            .map { list ->
-                list.filter { paramFilter.filter(it) }
-            }.collect { onMessage(it) }
+    private suspend fun uiFlowSink(
+        logItemStream: Flow<List<LogItem>>,
+        isNewStream: Boolean,
+        onMessage: (msg: List<LogItem>) -> Unit
+    ) {
+        val indexedCollection by lazy(LazyThreadSafetyMode.NONE) { queryCollection() }
+        val parser by lazy(LazyThreadSafetyMode.NONE) { sqlParser() }
+        logItemStream.collect { list ->
+            val filterResult = if (filterQuery.isNullOrBlank()) {
+                list
+            } else {
+                try {
+                    filterLogs(indexedCollection, list, parser, filterQuery)
+                } catch (e: Exception) {
+                    listOf(LogItem.errorContent("Error in query\n${e.message}"))
+                }
+            }
+            if (filterResult.isEmpty() && !isNewStream) {
+                onMessage(listOf(LogItem.noContent("No results found for this query")))
+            } else {
+                onMessage(filterResult)
+            }
+        }
     }
 
     fun pause() {

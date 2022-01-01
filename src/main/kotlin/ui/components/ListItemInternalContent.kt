@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import models.ErrorContent
 import models.InternalContent
 import models.NoLogsContent
 import storage.Db
@@ -20,17 +21,18 @@ import ui.CustomTheme
 fun ListItemInternalContent(internalContent: InternalContent?, modifier: Modifier = Modifier) {
     if (internalContent == null) return
     when (internalContent) {
-        NoLogsContent -> ListItemEmptyContent(modifier)
+        is NoLogsContent -> ListItemEmptyContent(internalContent, modifier)
+        is ErrorContent -> ListErrorContent(internalContent, modifier)
     }
 }
 
 @Composable
-fun ListItemEmptyContent(modifier: Modifier = Modifier) {
+private fun ListItemEmptyContent(noLogsContent: NoLogsContent, modifier: Modifier = Modifier) {
     Card(modifier) {
         val text = if (Db.sessionId() == null) {
             "Create a new session from side panel"
         } else {
-            "Record logs using the Start button above"
+            noLogsContent.msg
         }
         Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Image(painterResource("icons/empty_state.svg"), "Use start to log events",
@@ -41,5 +43,12 @@ fun ListItemEmptyContent(modifier: Modifier = Modifier) {
                 style = CustomTheme.typography.headings.h5
             )
         }
+    }
+}
+
+@Composable
+private fun ListErrorContent(errorContent: ErrorContent, modifier: Modifier = Modifier) {
+    Card(modifier) {
+        Text(errorContent.error)
     }
 }

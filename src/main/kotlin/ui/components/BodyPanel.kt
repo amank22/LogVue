@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import models.LogItem
 import models.SourceInternalContent
 import processor.MainProcessor
-import storage.Db
 import ui.CustomTheme
 
 @Composable
@@ -37,7 +36,6 @@ fun BodyPanel(
 ) {
     val logItems = remember(sessionId) { mutableStateListOf<LogItem>() }
     var streamRunning by remember(sessionId) { mutableStateOf(false) }
-    var paramItems by remember(sessionId) { mutableStateOf(Db.parameterSet.toList()) }
     Column(modifier) {
         val scope = rememberCoroutineScope()
         val state = rememberSaveable(saver = LazyListState.Saver, key = sessionId) {
@@ -49,7 +47,6 @@ fun BodyPanel(
             mutableStateOf(if (currentDevice == null) "No device is connected" else "")
         }
         val onNewMessage: (msg: List<LogItem>) -> Unit = { msg ->
-            paramItems = Db.parameterSet.toList().sorted()
             logItems.addAll(msg)
         }
         val onError: (logError: LogCatErrors) -> Unit = {
@@ -77,8 +74,8 @@ fun BodyPanel(
             }
         }
 
-        fun oldStreamFun() {
-            fetchOldData(processor, scope) {
+        fun oldStreamFun(filterQuery: String? = null) {
+            fetchOldData(processor, scope, filterQuery) {
                 onNewMessage(it)
                 if (logItems.isNotEmpty()) {
                     scope.launch {
@@ -88,12 +85,12 @@ fun BodyPanel(
             }
         }
         BodyHeader(
-            sessionId, paramItems,
+            sessionId,
             Modifier.fillMaxWidth().background(CustomTheme.colors.componentBackground),
             !streamRunning
         ) {
             logItems.clear()
-            oldStreamFun()
+            oldStreamFun(it)
         }
         if (errorString.isNotBlank()) {
             ErrorBar(errorString)
@@ -284,12 +281,14 @@ private fun streamData(
     }
 }
 
-private fun fetchOldData(processor: MainProcessor, scope: CoroutineScope, onMessage: (msg: List<LogItem>) -> Unit) {
+private fun fetchOldData(
+    processor: MainProcessor,
+    scope: CoroutineScope,
+    filterQuery: String? = null,
+    onMessage: (msg: List<LogItem>) -> Unit
+) {
     scope.launch {
-        processor.fetchOldStream { msg ->
-//                    Log.d("Got Message" , msg)
-            onMessage(msg)
-        }
+        processor.fetchOldStream(filterQuery, onMessage)
     }
 }
 

@@ -59,8 +59,10 @@ fun SessionsList(
                     false
                 })
                 .clickable {
-                    processor.startOldSession(it)
-                    onSessionChange(processor.getCurrentSessionId())
+                    if (!processor.isSameSession(it)) {
+                        processor.startOldSession(it)
+                        onSessionChange(processor.getCurrentSessionId())
+                    }
                 }.fillMaxWidth(0.95f)
             if (isThisCurrentSession) {
                 modifier1 = modifier1.background(

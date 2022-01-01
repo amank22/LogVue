@@ -69,12 +69,11 @@ object Helpers {
         val cut1 = rawText.removePrefix(faPrefix)
         val eventParamsCutter = cut1.split(Regex(","), 2)
         val eventName = eventParamsCutter[0].trim()
-        val properties = hashMapOf<String, Any>()
+        val properties = hashMapEntityOf<String, Any>()
         eventParamsCutter.getOrNull(1)?.trim()?.let {
             val objectItem = Item.ObjectItem(it.trim())
             val something = objectMapper.parse(objectItem) as HashMap<out String, Any>
             properties.putAll(something)
-            Db.parameterSet.addAll(properties.keys)
         }
         val time = msg.header.timestamp.toEpochMilli()
         return LogItem(source = SourceFA, eventName = eventName, properties = properties, localTime = time)
@@ -292,3 +291,5 @@ object Helpers {
     }
 
 }
+
+public inline fun <K, V> hashMapEntityOf(): HashMap<K, V> = HashMapEntity<K, V>()

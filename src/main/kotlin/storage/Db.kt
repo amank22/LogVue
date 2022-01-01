@@ -1,6 +1,5 @@
 package storage
 
-import models.Filter
 import models.LogItem
 import models.SessionInfo
 import org.mapdb.DBMaker
@@ -20,17 +19,6 @@ object Db {
     private var sessionId: String? = null
     private val LOCK = Any()
 
-    private val filters by lazy {
-        val filterDb = DBMaker.fileDB("filters").fileMmapEnableIfSupported().checksumHeaderBypass().make()
-        filterDb.hashMap("filters", Serializer.STRING, ObjectSerializer<HashSet<Filter>>())
-            .counterEnable().createOrOpen()
-    }
-
-    val parameterSet by lazy {
-        val memoryDb = DBMaker.memoryDB().closeOnJvmShutdown().cleanerHackEnable().make()
-        memoryDb.hashSet("allParamSet", Serializer.STRING).createOrOpen()
-    }
-
     val configs by lazy {
         db.hashMap("configs", Serializer.STRING, Serializer.STRING).createOrOpen()
     }
@@ -45,27 +33,8 @@ object Db {
         }
     }
 
-    fun getSessionFilters(): HashSet<Filter> {
-        if (sessionId() == null) return hashSetOf()
-        return filters[sessionId()] ?: hashSetOf()
-    }
-
     fun getSessionInfo(sessionId: String): SessionInfo? {
         return sessionInfoMap[sessionId]
-    }
-
-    fun addFilterInCurrentSession(filter: Filter) {
-        if (sessionId() == null) return
-        val oldFilters = getSessionFilters()
-        oldFilters.add(filter)
-        filters[sessionId()] = oldFilters
-    }
-
-    fun deleteFilterInCurrentSession(filter: Filter) {
-        if (sessionId() == null) return
-        val oldFilters = getSessionFilters()
-        oldFilters.remove(filter)
-        filters[sessionId()] = oldFilters
     }
 
     fun getAllSessions() = db.getAllNames().filter { it.startsWith(PREFIX) }.sortedBy { getSessionNumber(it) }
@@ -112,7 +81,6 @@ object Db {
         val oldSession = db.hashMap(sessionId, Serializer.STRING, ObjectSerializer<LogItem>())
             .open()
         oldSession.clear()
-        filters.remove(sessionId)
         sessionInfoMap.remove(sessionId)
         val recIds = arrayListOf<Long>()
         db.nameCatalogParamsFor(sessionId).forEach { (t, u) ->
@@ -140,7 +108,6 @@ object Db {
     }
 
     fun changeSession(sessionId: String?) {
-        parameterSet.clear()
         if (sessionId == null) {
             getOrCreateSession(null)
             return

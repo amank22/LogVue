@@ -2,4 +2,5 @@ package models
 
 sealed interface InternalContent
 
-object NoLogsContent : InternalContent
+data class NoLogsContent(val msg: String) : InternalContent
+data class ErrorContent(val error: String) : InternalContent
