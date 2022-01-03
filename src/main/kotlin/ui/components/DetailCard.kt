@@ -86,7 +86,7 @@ fun DetailHeader(
                 onCopyClick()
             }) {
                 Icon(
-                    painterResource("icons/Copy.svg"), "Copy",
+                    painterResource("icons/ico_copy.svg"), "Copy",
                     tint = CustomTheme.colors.highContrast
                 )
             }

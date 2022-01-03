@@ -2,6 +2,7 @@ package ui.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -25,7 +26,7 @@ fun ActionBar(
             if (it.isPrimary) {
                 Button(onClick, content = {
                     ButtonContent(painter, it, ButtonDefaults.buttonColors())
-                })
+                }, shape = RoundedCornerShape(4.dp), elevation = ButtonDefaults.elevation(0.dp))
             } else {
                 TextButton(onClick, content = {
                     ButtonContent(painter, it, ButtonDefaults.textButtonColors())
@@ -50,11 +51,13 @@ private fun ButtonContent(
 
 sealed class ActionMenu(val text: String, val isPrimary: Boolean, val icon: String = "") {
     companion object {
-        val DefaultList = arrayListOf(ActionStart, ActionExport)
-        val PauseList = arrayListOf(ActionPause, ActionExport)
+        val DefaultList = arrayListOf(ActionStart, ActionExport, ActionFeedback)
+        val PauseList = arrayListOf(ActionPause, ActionExport, ActionFeedback)
     }
 }
+
 // TODO: Add enable flag to disable button when maybe device is not connected or there is no data to export
-object ActionStart : ActionMenu("Start", isPrimary = true, icon = "icons/Play.svg")
-object ActionPause : ActionMenu("Pause", isPrimary = true, icon = "icons/Pause.svg")
+object ActionStart : ActionMenu("Start", isPrimary = true, icon = "icons/ico_play.svg")
+object ActionPause : ActionMenu("Pause", isPrimary = true, icon = "icons/ico_pause.svg")
 object ActionExport : ActionMenu("Export Session Data", isPrimary = false, icon = "icons/ico-share.svg")
+object ActionFeedback : ActionMenu("Feedback", isPrimary = false, icon = "icons/ico-email.svg")

@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import inputs.adb.ddmlib.Devices
@@ -84,7 +85,8 @@ private fun SideNavHeader(header: String) {
 private fun AppLogo() {
     Image(
         painterResource("icons/logo.svg"), APP_NAME,
-        Modifier.padding(24.dp),
-        colorFilter = ColorFilter.tint(CustomTheme.colors.highContrast)
+        Modifier.fillMaxWidth(0.8f).padding(24.dp),
+        colorFilter = ColorFilter.tint(CustomTheme.colors.highContrast),
+        contentScale = ContentScale.FillWidth
     )
 }

@@ -113,13 +113,15 @@ class MainProcessor {
     ) {
         val indexedCollection by lazy(LazyThreadSafetyMode.NONE) { queryCollection() }
         val parser by lazy(LazyThreadSafetyMode.NONE) { sqlParser() }
+        val fQuery = filterQuery?.trim()
         logItemStream.collect { list ->
-            val filterResult = if (filterQuery.isNullOrBlank()) {
-                list
+            val filterResult = if (fQuery.isNullOrBlank() || fQuery == QUERY_PREFIX) {
+                filterLogs(indexedCollection, list, parser, "Select * from logs")
             } else {
                 try {
-                    filterLogs(indexedCollection, list, parser, filterQuery)
+                    filterLogs(indexedCollection, list, parser, fQuery)
                 } catch (e: Exception) {
+                    e.printStackTrace()
                     listOf(LogItem.errorContent("Error in query\n${e.message}"))
                 }
             }

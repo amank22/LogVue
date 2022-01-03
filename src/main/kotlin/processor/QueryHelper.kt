@@ -13,6 +13,8 @@ import kotlin.reflect.KProperty1
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
+const val QUERY_PREFIX = "Select * from logs where"
+
 inline fun <reified O, reified A> attribute(name: String, accessor: KProperty1<O, A>): FunctionalSimpleAttribute<O, A> {
     return FunctionalSimpleAttribute(O::class.java, A::class.java, name) { accessor.get(it) }
 }
@@ -55,12 +57,32 @@ private fun registerPropertiesInParser(
 ) {
     val propertySet = hashSetOf<String>()
     list.forEach {
-        it.properties.forEach { (k, v) ->
-            if (!propertySet.contains(k)) {
-                val att: ParameterizedAttribute<Any> = ParameterizedAttribute(k, v.javaClass)
+        registerMapPropertiesInParser(it.properties, propertySet, parser)
+    }
+}
+
+private fun registerMapPropertiesInParser(
+    properties: Map<String, Any>,
+    propertySet: HashSet<String>,
+    parser: SQLParser<LogItem>,
+    parentKey: String = ""
+) {
+    properties.forEach { (k, v) ->
+        if (!propertySet.contains(k)) {
+            val att: ParameterizedAttribute<Any> = ParameterizedAttribute("$parentKey$k", v.javaClass)
+            if (v is Map<*, *>) {
+                @Suppress("UNCHECKED_CAST")
+                registerMapPropertiesInParser(
+                    v as Map<String, Any>, propertySet,
+                    parser, "$parentKey$k."
+                )
+            } else {
+                println("Attribute : ${att.attributeName} with first value = $v and v class = ${v.javaClass.name}")
                 parser.registerAttribute(att)
                 propertySet.add(k)
             }
+        } else {
+//            println("Duplicate Attribute : $k = $v")
         }
     }
 }

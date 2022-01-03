@@ -2,6 +2,7 @@ package processor
 
 import com.googlecode.cqengine.attribute.SimpleNullableAttribute
 import com.googlecode.cqengine.query.option.QueryOptions
+import javassist.NotFoundException
 import models.LogItem
 
 
@@ -9,11 +10,48 @@ class ParameterizedAttribute<T>(private val mapKey: String, private val clazz: C
     SimpleNullableAttribute<LogItem, T>(LogItem::class.java, clazz, mapKey) {
 
     override fun getValue(logItem: LogItem, queryOptions: QueryOptions?): T? {
-        val result = logItem.properties[mapKey]
+        val result = getNestedValue(logItem)
         if (result == null || attributeType.isAssignableFrom(clazz)) {
             return clazz.cast(result)
         }
         throw ClassCastException("Cannot cast " + result.javaClass.name + " to " + attributeType.name + " for map key: " + mapKey);
+    }
+
+    private fun getNestedValue(logItem: LogItem): Any? {
+        val map = logItem.properties
+        if (map.isEmpty()) {
+            throw NotFoundException("$mapKey not found in properties as it is empty")
+        }
+        val nestedKeys = mapKey.split(".")
+        if (nestedKeys.isEmpty()) {
+            throw IllegalArgumentException("Key should not be empty")
+        }
+        val nSize = nestedKeys.size
+        if (nSize == 1) {
+            return map[mapKey]
+        }
+        var innerMap = map
+        var value: Any? = null
+        nestedKeys.forEachIndexed { index, it ->
+            value = innerMap[it]
+            if (value == null) {
+                return null // todo: not sure about this logic
+            }
+            if (value !is Map<*, *> && index != (nSize - 1)) {
+                val ex = IllegalArgumentException(
+                    "Nested structure should be in a map/object. " +
+                            "Nested key = $nestedKeys with current key = $it and value = $value.\n" +
+                            "Log Item is $logItem"
+                )
+                ex.printStackTrace()
+                return null
+            }
+            if (index != (nSize - 1)) {
+                @Suppress("UNCHECKED_CAST")
+                innerMap = value as HashMap<String, Any>
+            }
+        }
+        return value
     }
 
     override fun hashCode(): Int {

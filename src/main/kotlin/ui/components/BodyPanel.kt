@@ -96,12 +96,6 @@ fun BodyPanel(
             ErrorBar(errorString)
         }
         var isOpen by remember { mutableStateOf(false) }
-//        var showLoader by remember { mutableStateOf(false) }
-//        if (showLoader) {
-//            StyledCustomVerticalDialog({}) {
-//                CircularProgressIndicator(Modifier.align(Alignment.Center))
-//            }
-//        }
         if (isOpen) {
             val sessionInfo = processor.getSessionInfo(sessionId.orEmpty())
             if (sessionInfo != null) {
@@ -110,30 +104,35 @@ fun BodyPanel(
                 }
             }
         }
-        if (!sessionId.isNullOrBlank()) {
-            ActionBarMenu(actionMenuItems) {
-                when (it) {
-                    ActionExport -> {
-                        isOpen = true
-                    }
-                    ActionPause -> {
-                        pauseProcessor(processor)
-                        actionMenuItems = ActionMenu.DefaultList
-                        streamRunning = false
-                    }
-                    ActionStart -> {
-                        streamData(processor, scope, onError, onNewMessage)
-                        actionMenuItems = ActionMenu.PauseList
-                        streamRunning = true
-                        errorString = ""
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                "Analytics Logs", Modifier.padding(24.dp),
+                style = CustomTheme.typography.headings.h3
+            )
+            if (!sessionId.isNullOrBlank()) {
+                ActionBar(
+                    actionMenuItems, Modifier
+                        .padding(horizontal = 24.dp, vertical = 8.dp)
+                ) {
+                    when (it) {
+                        ActionExport -> {
+                            isOpen = true
+                        }
+                        ActionPause -> {
+                            pauseProcessor(processor)
+                            actionMenuItems = ActionMenu.DefaultList
+                            streamRunning = false
+                        }
+                        ActionStart -> {
+                            streamData(processor, scope, onError, onNewMessage)
+                            actionMenuItems = ActionMenu.PauseList
+                            streamRunning = true
+                            errorString = ""
+                        }
                     }
                 }
             }
         }
-        Text(
-            "Analytics Logs", Modifier.padding(24.dp),
-            style = CustomTheme.typography.headings.h3
-        )
         MainBodyContent(logItems, Modifier.fillMaxSize(), streamRunning, sessionId, state)
         LaunchedEffect(sessionId) {
             oldStreamFun()
@@ -241,15 +240,6 @@ private fun LogListView(
 @Composable
 fun LoadingAnimation(modifier: Modifier = Modifier) {
     CircularProgressIndicator(modifier)
-}
-
-@Composable
-private fun ActionBarMenu(actionMenuItems: List<ActionMenu>, onMenuClick: (action: ActionMenu) -> Unit) {
-    ActionBar(
-        actionMenuItems, Modifier.fillMaxWidth()
-            .background(CustomTheme.colors.componentBackground)
-            .padding(horizontal = 24.dp, vertical = 8.dp), onMenuClick
-    )
 }
 
 @Composable
