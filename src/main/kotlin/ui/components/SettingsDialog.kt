@@ -67,7 +67,7 @@ fun OtherSettingBlock(modifier: Modifier = Modifier) {
         val aboutUsText = buildAnnotatedString {
             withStyle(SpanStyle(color = CustomTheme.colors.mediumContrast)) {
                 append("This ")
-                pushStringAnnotation("gitProjectLink", "https://www.github.com/amank22")
+                pushStringAnnotation("gitProjectLink", "https://github.com/amank22/LogVue")
                 withStyle(
                     SpanStyle(
                         textDecoration = TextDecoration.Underline,
@@ -119,4 +119,3 @@ object SocialLinkedin : SocialIcons("icons/social/social_linkedIn.svg", "https:/
 object SocialFacebook : SocialIcons("icons/social/social_facebook.svg", "")
 
 fun openBrowser(url: String) = Helpers.openInBrowser(url)
-

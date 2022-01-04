@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -55,10 +54,7 @@ fun SimpleVerticalDialog(header: String, onDismissRequest: () -> Unit, content: 
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(header, Modifier.weight(1f), style = CustomTheme.typography.headings.h2)
                 IconButton(
-                    onDismissRequest, Modifier.size(36.dp).background(
-                        CustomTheme.colors.componentBackground2,
-                        CircleShape
-                    )
+                    onDismissRequest, Modifier.size(36.dp)
                 ) {
                     Icon(painterResource("icons/ico_close.xml"), "Close")
                 }

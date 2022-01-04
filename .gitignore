@@ -74,3 +74,4 @@ outTmp/
 kotlin-ide/
 sessions.db
 filters
+/.idea/uiDesigner.xml

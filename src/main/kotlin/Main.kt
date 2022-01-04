@@ -20,6 +20,7 @@ import storage.Db
 import ui.AppTheme
 import ui.CustomTheme
 import ui.components.BodyPanel
+import ui.components.IntroDialog
 import ui.components.SideNavigation
 import utils.APP_NAME
 import utils.Helpers
@@ -45,6 +46,18 @@ fun App() {
         }
         LaunchedEffect(Unit) {
             AdbHelper.init()
+        }
+        LaunchIntroIfNeeded()
+    }
+}
+
+@Composable
+fun LaunchIntroIfNeeded() {
+    var introLaunched by remember { mutableStateOf(Db.configs["isIntroLaunched"].toBoolean()) }
+    if (!introLaunched) {
+        IntroDialog {
+            Db.configs["isIntroLaunched"] = "true"
+            introLaunched = true
         }
     }
 }
