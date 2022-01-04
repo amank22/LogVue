@@ -15,7 +15,8 @@ import ui.LocalCustomTypography
 
 @Composable
 fun Chip(
-    text: String, modifier: Modifier = Modifier,
+    text: String,
+    modifier: Modifier = Modifier,
     bgColor: Color = LocalCustomColors.current.componentBackground,
     textColor: Color = LocalCustomColors.current.highContrast,
     addBorder: Boolean = false,

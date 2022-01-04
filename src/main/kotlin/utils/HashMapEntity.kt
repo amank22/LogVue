@@ -21,5 +21,4 @@ class HashMapEntity<K, V> : HashMap<K, V>() {
     override fun equals(other: Any?): Boolean {
         return super.equals(other)
     }
-
 }

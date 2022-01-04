@@ -4,7 +4,6 @@ import models.LogItem
 import models.SourceInternalContent
 import storage.Db
 
-
 object DbSink {
 
     fun save(value: LogItem?) {

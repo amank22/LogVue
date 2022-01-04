@@ -16,5 +16,4 @@ object Log {
     fun d(msg: String) {
         d("Debug", msg)
     }
-
 }

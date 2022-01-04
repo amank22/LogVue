@@ -15,7 +15,6 @@ import utils.Log
 import utils.failureOrNull
 import utils.getOrNull
 
-
 class MainProcessor {
 
     private val streamer = AndroidLogStreamer()
@@ -140,5 +139,4 @@ class MainProcessor {
             Log.d("unnecessary", "keeping exception for now in pause")
         }
     }
-
 }

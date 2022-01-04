@@ -148,5 +148,4 @@ object Db {
     fun close() {
         db.close()
     }
-
 }

@@ -29,7 +29,7 @@ fun LogList(
     list: List<LogItem>,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
-    onClick: (logItem : LogItem) -> Unit
+    onClick: (logItem: LogItem) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     //    RemainingItems(state, lastIndex)

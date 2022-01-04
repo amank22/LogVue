@@ -62,7 +62,6 @@ fun LaunchIntroIfNeeded() {
     }
 }
 
-
 @Composable
 private fun RemainingItems(state: LazyListState, lastIndex: Int) {
     val fVIOfState = state.firstVisibleItemIndex

@@ -21,7 +21,6 @@ data class LogItem(
 
         fun noContent(msg: String) = LogItem(SourceInternalContent, "No Logs", internalContent = NoLogsContent(msg))
         fun errorContent(error: String) = LogItem(SourceInternalContent, "Error", internalContent = ErrorContent(error))
-
     }
 
     @Transient

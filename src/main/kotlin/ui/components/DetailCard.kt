@@ -66,7 +66,9 @@ fun DetailCardEmpty() {
 
 @Composable
 fun DetailHeader(
-    logItem: LogItem, modifier: Modifier = Modifier, onCloseClick: () -> Unit,
+    logItem: LogItem,
+    modifier: Modifier = Modifier,
+    onCloseClick: () -> Unit,
     onCopyClick: () -> Unit
 ) {
     // TODO: Move to something like in ActionBar

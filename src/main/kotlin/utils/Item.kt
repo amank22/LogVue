@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.regex.Pattern
 
-
 /**
  * Model for parsing toString() output.
  *
@@ -38,8 +37,8 @@ sealed class Item(val stringRepresentation: String?) {
                 }
             } else {
                 throw IllegalArgumentException(
-                    "cannot create object from string: "
-                            + stringRepresentation
+                    "cannot create object from string: " +
+                            stringRepresentation
                 )
             }
         }
@@ -49,11 +48,11 @@ sealed class Item(val stringRepresentation: String?) {
         }
 
         override fun toString(): String {
-            return (super.toString()
-                    + "\n Type="
-                    + type
-                    + "\n  "
-                    + Joiner.on("\n  ").withKeyValueSeparator(" = ")
+            return (super.toString() +
+                    "\n Type=" +
+                    type +
+                    "\n  " +
+                    Joiner.on("\n  ").withKeyValueSeparator(" = ")
                 .join(attributes))
         }
     }
@@ -120,12 +119,12 @@ sealed class Item(val stringRepresentation: String?) {
                 } else {
                     if (result.isEmpty()) {
                         throw IllegalStateException(
-                            ("first comma must not occur before first equal sign! ("
-                                    + string + ")")
+                            ("first comma must not occur before first equal sign! (" +
+                                    string + ")")
                         )
                     }
-                    result[result.size - 1] = (result[result.size - 1]
-                            + ", " + current)
+                    result[result.size - 1] = (result[result.size - 1] +
+                            ", " + current)
                 }
             }
             return result
@@ -146,12 +145,12 @@ sealed class Item(val stringRepresentation: String?) {
                 val open = contains(next, '[')
                 val close = contains(next, ']')
                 LOGGER.debug(
-                    ("openBrackets: " + openBrackets + ", open: " + open
-                            + ", close: " + close + ", next: " + next)
+                    ("openBrackets: " + openBrackets + ", open: " + open +
+                            ", close: " + close + ", next: " + next)
                 )
                 if (openBrackets > 0) {
-                    result[result.size - 1] = (result[result.size - 1]
-                            + ", " + next)
+                    result[result.size - 1] = (result[result.size - 1] +
+                            ", " + next)
                 } else {
                     result.add(next)
                 }

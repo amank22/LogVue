@@ -2,7 +2,7 @@ package inputs.adb.ddmlib
 
 import com.android.ddmlib.MultiLineReceiver
 
-class SingleValueReceiver(val onValue : (value : String) -> Unit) : MultiLineReceiver() {
+class SingleValueReceiver(val onValue: (value: String) -> Unit) : MultiLineReceiver() {
     var isResultPending = false
 
     override fun isCancelled(): Boolean = isResultPending

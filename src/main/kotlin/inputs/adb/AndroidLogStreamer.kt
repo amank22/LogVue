@@ -14,5 +14,4 @@ class AndroidLogStreamer {
     fun stop() {
         AdbHelper.closeLogs()
     }
-
 }

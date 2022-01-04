@@ -51,7 +51,6 @@ fun IntroDialog(onDismissRequest: () -> Unit) {
             Button(onDismissRequest, elevation = ButtonDefaults.elevation(0.dp)) {
                 Text("Let's Start")
             }
-
         }
     }
 }
