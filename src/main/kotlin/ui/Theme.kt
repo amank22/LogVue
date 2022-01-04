@@ -22,13 +22,14 @@ fun AppTheme(isLightTheme: Boolean = true, content: @Composable () -> Unit) =
 
 @Immutable
 data class CustomColors(
-    val background: Color= Color.Unspecified,
-    val componentBackground: Color= Color.Unspecified,
-    val componentBackground2: Color= Color.Unspecified,
-    val highContrast: Color= Color.Unspecified,
-    val mediumContrast: Color= Color.Unspecified,
-    val lowContrast: Color= Color.Unspecified,
-    val accent: Color= Color.Unspecified,
+    val background: Color = Color.Unspecified,
+    val componentBackground: Color = Color.Unspecified,
+    val componentBackground2: Color = Color.Unspecified,
+    val highContrast: Color = Color.Unspecified,
+    val mediumContrast: Color = Color.Unspecified,
+    val lowContrast: Color = Color.Unspecified,
+    val componentOutline: Color = Color.Unspecified,
+    val accent: Color = Color.Unspecified,
     val alertColors: CustomAlertColors = CustomAlertColors()
 )
 
@@ -97,7 +98,8 @@ fun CustomTheme(
             mediumContrast = Color(0xFF566976),
             lowContrast = Color(0xFFACBAC3),
             accent = Color(0xFF31AAB7),
-            alertColors = alertColors
+            alertColors = alertColors,
+            componentOutline = Color(0xFFDAE2E8)
         )
     } else {
         CustomColors(
@@ -108,7 +110,8 @@ fun CustomTheme(
             mediumContrast = Color(0xFFACBAC3),
             lowContrast = Color(0xFF566976),
             accent = Color(0xFF31AAB7),
-            alertColors = alertColors
+            alertColors = alertColors,
+            componentOutline = Color(0xFF3A4349)
         )
     }
     val customTypography = CustomTypography(
@@ -122,7 +125,7 @@ fun CustomTheme(
         pressed = 8.dp
     )
     val customShapes = Shapes(
-        small = RoundedCornerShape(50), medium = RoundedCornerShape(8.dp),
+        small = RoundedCornerShape(8.dp), medium = RoundedCornerShape(8.dp),
         large = RoundedCornerShape(8.dp)
     )
     val materialColors = Colors(

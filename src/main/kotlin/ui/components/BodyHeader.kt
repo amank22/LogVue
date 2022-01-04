@@ -19,7 +19,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import processor.QUERY_PREFIX
 import ui.CustomTheme
-import utils.Helpers
 
 @Composable
 fun BodyHeader(
@@ -133,19 +132,17 @@ private fun HeaderEndIconsPanel(
             Icon(painter, "Close", tint = CustomTheme.colors.highContrast)
         }
         Box(Modifier.width(1.dp).fillMaxHeight().background(CustomTheme.colors.lowContrast))
-        IconButton({}) { // TODO: Settings
+        var showSettingDialog by remember { mutableStateOf(false) }
+        IconButton({
+            showSettingDialog = true
+        }) { // TODO: Settings
             val painter = painterResource("icons/ico-settings.svg")
             Icon(painter, "Settings", tint = CustomTheme.colors.highContrast)
         }
-//        DarkThemeSwitch()
+        if (showSettingDialog) {
+            SettingsDialog {
+                showSettingDialog = false
+            }
+        }
     }
-}
-
-@Composable
-private fun DarkThemeSwitch() {
-    var switched by remember { mutableStateOf(!Helpers.isThemeLightMode.value) }
-    Switch(switched, {
-        switched = it
-        Helpers.switchThemes(!it)
-    })
 }

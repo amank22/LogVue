@@ -17,7 +17,9 @@ import org.snakeyaml.engine.v2.api.StreamDataWriter
 import org.snakeyaml.engine.v2.common.ScalarStyle
 import processor.YamlWriter
 import storage.Db
+import java.awt.Desktop
 import java.io.PrintWriter
+import java.net.URI
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.absolutePathString
@@ -287,6 +289,21 @@ object Helpers {
             Runtime.getRuntime().exec(command)
         } catch (e: Exception) {
             Log.d("failed to open file manager")
+        }
+    }
+
+    fun openInBrowser(url: String) {
+        openInBrowser(URI.create(url))
+    }
+
+    fun openInBrowser(uri: URI) {
+        val osName by lazy(LazyThreadSafetyMode.NONE) { System.getProperty("os.name").lowercase(Locale.getDefault()) }
+        val desktop = Desktop.getDesktop()
+        when {
+            Desktop.isDesktopSupported() && desktop.isSupported(Desktop.Action.BROWSE) -> desktop.browse(uri)
+            "mac" in osName -> Runtime.getRuntime().exec("open $uri")
+            "nix" in osName || "nux" in osName -> Runtime.getRuntime().exec("xdg-open $uri")
+            else -> throw RuntimeException("cannot open $uri")
         }
     }
 

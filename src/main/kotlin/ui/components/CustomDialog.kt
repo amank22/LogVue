@@ -5,10 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Surface
-import androidx.compose.material.UndecoratedWindowAlertDialogProvider
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -24,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.rememberDialogState
 import com.google.common.primitives.Floats
+import ui.CustomTheme
 
 @Composable
 fun StyledCustomVerticalDialog(onDismissRequest: () -> Unit, content: @Composable BoxScope.() -> Unit) {
@@ -40,6 +40,32 @@ fun StyledCustomVerticalDialog(onDismissRequest: () -> Unit, content: @Composabl
                     translationY = -50f
                 }
                 .align(Alignment.BottomCenter), Alignment.BottomCenter)
+            content()
+        }
+    }
+}
+
+@Composable
+fun SimpleVerticalDialog(header: String, onDismissRequest: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+    CustomDialog(
+        dialogWidthRatio = 0.28f,
+        dialogHeightRatio = 0.56f, onDismissRequest = onDismissRequest
+    ) {
+        Column(Modifier.fillMaxSize().padding(16.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(header, Modifier.weight(1f), style = CustomTheme.typography.headings.h2)
+                IconButton(
+                    onDismissRequest, Modifier.size(36.dp).background(
+                        CustomTheme.colors.componentBackground2,
+                        CircleShape
+                    )
+                ) {
+                    Icon(painterResource("icons/ico_close.xml"), "Close")
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+            Divider(color = CustomTheme.colors.componentOutline, thickness = (0.5).dp)
+            Spacer(Modifier.height(16.dp))
             content()
         }
     }
