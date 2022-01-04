@@ -15,12 +15,8 @@ import java.util.regex.Pattern
  *
  * @author dschreiber
  */
-abstract class Item(val stringRepresentation: String?) {
-    class ValueItem(stringRepresentation: String?) : Item(stringRepresentation) {
-        val isNullOrEmpty: Boolean
-            get() = (stringRepresentation.isNullOrBlank())
-                    || ("null" == stringRepresentation)
-    }
+sealed class Item(val stringRepresentation: String?) {
+    class ValueItem(stringRepresentation: String?) : Item(stringRepresentation)
 
     class ObjectItem(stringRepresentation: String) : Item(stringRepresentation) {
         var type: String? = null
@@ -77,17 +73,9 @@ abstract class Item(val stringRepresentation: String?) {
             }
         }
 
-        fun getValues(): List<Item> {
-            return values
-        }
-
         override fun toString(): String {
             return super.toString() + "\n  " + Joiner.on("\n  ").join(values)
         }
-    }
-
-    init {
-//        LOGGER.info("creating: $stringRepresentation")
     }
 
     override fun toString(): String {
