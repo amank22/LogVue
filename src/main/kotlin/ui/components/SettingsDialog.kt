@@ -119,4 +119,3 @@ object SocialLinkedin : SocialIcons("icons/social/social_linkedIn.svg", "https:/
 object SocialFacebook : SocialIcons("icons/social/social_facebook.svg", "")
 
 fun openBrowser(url: String) = Helpers.openInBrowser(url)
-
