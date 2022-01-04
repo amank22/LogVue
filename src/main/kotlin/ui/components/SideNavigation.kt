@@ -24,7 +24,7 @@ fun SideNavigation(
     onSessionChange: (sessionId: String?) -> Unit
 ) {
     Column(modifier) {
-        AppLogo()
+        AppLogo(Modifier.fillMaxWidth(0.8f).padding(24.dp))
         SideNavHeader("Sessions")
 
         SessionsBox(sessionId, processor, onSessionChange)
@@ -82,10 +82,10 @@ private fun SideNavHeader(header: String) {
 }
 
 @Composable
-private fun AppLogo() {
+fun AppLogo(modifier: Modifier = Modifier) {
     Image(
         painterResource("icons/logo.svg"), APP_NAME,
-        Modifier.fillMaxWidth(0.8f).padding(24.dp),
+        modifier,
         colorFilter = ColorFilter.tint(CustomTheme.colors.highContrast),
         contentScale = ContentScale.FillWidth
     )
