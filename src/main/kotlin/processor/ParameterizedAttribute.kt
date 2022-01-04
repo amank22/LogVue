@@ -66,5 +66,4 @@ class ParameterizedAttribute<T>(private val mapKey: String, private val clazz: C
     override fun equals(other: Any?): Boolean {
         return super.equals(other) && mapKey == (other as? ParameterizedAttribute<*>)?.mapKey
     }
-
 }

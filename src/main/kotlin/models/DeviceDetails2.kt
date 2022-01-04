@@ -31,5 +31,4 @@ class DeviceDetails2(
     override fun hashCode(): Int {
         return serial.hashCode()
     }
-
 }
