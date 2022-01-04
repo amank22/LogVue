@@ -143,5 +143,4 @@ object AdbHelper {
         if (!adb.isFile) return null
         return adb.absolutePath
     }
-
 }

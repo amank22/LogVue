@@ -32,5 +32,4 @@ class DeviceDetails2(
         return serial.hashCode()
     }
 
-
 }

@@ -66,7 +66,6 @@ sealed class Either<out L : Serializable, out R : Serializable> : Serializable {
      */
     fun <L : Serializable> left(a: L) = Either.Left(a)
 
-
     /**
      * Creates a Left type.
      * @see Right

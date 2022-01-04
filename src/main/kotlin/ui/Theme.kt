@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.sp
 fun AppTheme(isLightTheme: Boolean = true, content: @Composable () -> Unit) =
     CustomTheme(isLightTheme, content = content)
 
-
 @Immutable
 data class CustomColors(
     val background: Color = Color.Unspecified,

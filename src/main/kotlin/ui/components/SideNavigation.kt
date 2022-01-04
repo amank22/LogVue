@@ -20,7 +20,9 @@ import utils.APP_NAME
 
 @Composable
 fun SideNavigation(
-    processor: MainProcessor, sessionId: String?, modifier: Modifier = Modifier,
+    processor: MainProcessor,
+    sessionId: String?,
+    modifier: Modifier = Modifier,
     onSessionChange: (sessionId: String?) -> Unit
 ) {
     Column(modifier) {

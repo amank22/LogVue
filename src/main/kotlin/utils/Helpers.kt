@@ -24,7 +24,6 @@ import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.absolutePathString
 
-
 object Helpers {
 
     private val objectMapper by lazy {
@@ -306,7 +305,6 @@ object Helpers {
             else -> throw RuntimeException("cannot open $uri")
         }
     }
-
 }
 
 public inline fun <K, V> hashMapEntityOf(): HashMap<K, V> = HashMapEntity<K, V>()

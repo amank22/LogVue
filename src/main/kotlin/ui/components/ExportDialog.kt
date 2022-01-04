@@ -23,7 +23,8 @@ import kotlin.io.path.absolutePathString
 
 @Composable
 fun ExportDialog(
-    sessionInfo: SessionInfo, logItems: List<LogItem>,
+    sessionInfo: SessionInfo,
+    logItems: List<LogItem>,
     onDismissRequest: () -> Unit
 ) {
     StyledCustomVerticalDialog(onDismissRequest) {
@@ -104,7 +105,6 @@ private fun ParameterFormats(
             }
         }
     }
-
 }
 
 @Composable
@@ -123,7 +123,9 @@ private fun SelectRadioButton(selected: Boolean, text: String, modifier: Modifie
 
 @Composable
 private fun SelectCheckBox(
-    selected: Boolean, text: String, modifier: Modifier = Modifier,
+    selected: Boolean,
+    text: String,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Row(

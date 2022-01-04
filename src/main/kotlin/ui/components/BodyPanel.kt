@@ -159,7 +159,8 @@ private fun ErrorBar(errorString: String) {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun MainBodyContent(
-    logItems: SnapshotStateList<LogItem>, modifier: Modifier = Modifier,
+    logItems: SnapshotStateList<LogItem>,
+    modifier: Modifier = Modifier,
     streamRunning: Boolean = false,
     sessionId: String?,
     state: LazyListState
@@ -260,8 +261,10 @@ private fun PortalToTopButton(state: LazyListState, lastIndex: Int, modifier: Mo
 }
 
 private fun streamData(
-    processor: MainProcessor, scope: CoroutineScope,
-    onError: (logError: LogCatErrors) -> Unit, onMessage: (msg: List<LogItem>) -> Unit
+    processor: MainProcessor,
+    scope: CoroutineScope,
+    onError: (logError: LogCatErrors) -> Unit,
+    onMessage: (msg: List<LogItem>) -> Unit
 ) {
     scope.launch {
         processor.observeNewStream(onError) { msg ->

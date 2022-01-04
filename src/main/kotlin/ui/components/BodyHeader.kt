@@ -22,7 +22,8 @@ import ui.CustomTheme
 
 @Composable
 fun BodyHeader(
-    sessionId: String?, modifier: Modifier = Modifier,
+    sessionId: String?,
+    modifier: Modifier = Modifier,
     filtersEnabled: Boolean = true,
     onFilterUpdated: (filterText: String) -> Unit
 ) = FilterSearchHeader(modifier, sessionId, filtersEnabled, onFilterUpdated)
@@ -49,8 +50,9 @@ private fun FilterSearchHeader(
             if (it.key == Key.Enter) {
                 sendFilterBack()
                 true
-            } else
+            } else {
                 false
+            }
         }.onFocusChanged {
             isFocused = it.isFocused
         }
@@ -108,7 +110,8 @@ private fun HeaderEndIconsPanel(
     text: String,
     isFocused: Boolean,
     modifier: Modifier = Modifier,
-    onSearchClick: () -> Unit, onCloseClick: () -> Unit
+    onSearchClick: () -> Unit,
+    onCloseClick: () -> Unit
 ) {
     Row(
         modifier,

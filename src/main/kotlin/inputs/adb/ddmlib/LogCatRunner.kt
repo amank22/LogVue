@@ -11,9 +11,10 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.concurrent.GuardedBy
 
-
 class LogCatRunner(
-    val mDevice: IDevice, pid: Long, filters: Array<String> = arrayOf("FA", "FA-SVC")
+    val mDevice: IDevice,
+    pid: Long,
+    filters: Array<String> = arrayOf("FA", "FA-SVC")
 ) {
 
     companion object {
@@ -117,5 +118,4 @@ class LogCatRunner(
             l.log(messages)
         }
     }
-
 }

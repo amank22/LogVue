@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.regex.Pattern
 
-
 /**
  * Model for parsing toString() output.
  *
@@ -15,12 +14,8 @@ import java.util.regex.Pattern
  *
  * @author dschreiber
  */
-abstract class Item(val stringRepresentation: String?) {
-    class ValueItem(stringRepresentation: String?) : Item(stringRepresentation) {
-        val isNullOrEmpty: Boolean
-            get() = (stringRepresentation.isNullOrBlank())
-                    || ("null" == stringRepresentation)
-    }
+sealed class Item(val stringRepresentation: String?) {
+    class ValueItem(stringRepresentation: String?) : Item(stringRepresentation)
 
     class ObjectItem(stringRepresentation: String) : Item(stringRepresentation) {
         var type: String? = null
@@ -42,8 +37,8 @@ abstract class Item(val stringRepresentation: String?) {
                 }
             } else {
                 throw IllegalArgumentException(
-                    "cannot create object from string: "
-                            + stringRepresentation
+                    "cannot create object from string: " +
+                            stringRepresentation
                 )
             }
         }
@@ -53,11 +48,11 @@ abstract class Item(val stringRepresentation: String?) {
         }
 
         override fun toString(): String {
-            return (super.toString()
-                    + "\n Type="
-                    + type
-                    + "\n  "
-                    + Joiner.on("\n  ").withKeyValueSeparator(" = ")
+            return (super.toString() +
+                    "\n Type=" +
+                    type +
+                    "\n  " +
+                    Joiner.on("\n  ").withKeyValueSeparator(" = ")
                 .join(attributes))
         }
     }
@@ -77,17 +72,9 @@ abstract class Item(val stringRepresentation: String?) {
             }
         }
 
-        fun getValues(): List<Item> {
-            return values
-        }
-
         override fun toString(): String {
             return super.toString() + "\n  " + Joiner.on("\n  ").join(values)
         }
-    }
-
-    init {
-//        LOGGER.info("creating: $stringRepresentation")
     }
 
     override fun toString(): String {
@@ -132,12 +119,12 @@ abstract class Item(val stringRepresentation: String?) {
                 } else {
                     if (result.isEmpty()) {
                         throw IllegalStateException(
-                            ("first comma must not occur before first equal sign! ("
-                                    + string + ")")
+                            ("first comma must not occur before first equal sign! (" +
+                                    string + ")")
                         )
                     }
-                    result[result.size - 1] = (result[result.size - 1]
-                            + ", " + current)
+                    result[result.size - 1] = (result[result.size - 1] +
+                            ", " + current)
                 }
             }
             return result
@@ -158,12 +145,12 @@ abstract class Item(val stringRepresentation: String?) {
                 val open = contains(next, '[')
                 val close = contains(next, ']')
                 LOGGER.debug(
-                    ("openBrackets: " + openBrackets + ", open: " + open
-                            + ", close: " + close + ", next: " + next)
+                    ("openBrackets: " + openBrackets + ", open: " + open +
+                            ", close: " + close + ", next: " + next)
                 )
                 if (openBrackets > 0) {
-                    result[result.size - 1] = (result[result.size - 1]
-                            + ", " + next)
+                    result[result.size - 1] = (result[result.size - 1] +
+                            ", " + next)
                 } else {
                     result.add(next)
                 }

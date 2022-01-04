@@ -5,7 +5,6 @@ import com.googlecode.cqengine.query.option.QueryOptions
 import javassist.NotFoundException
 import models.LogItem
 
-
 class ParameterizedAttribute<T>(private val mapKey: String, private val clazz: Class<T>) :
     SimpleNullableAttribute<LogItem, T>(LogItem::class.java, clazz, mapKey) {
 
@@ -14,7 +13,7 @@ class ParameterizedAttribute<T>(private val mapKey: String, private val clazz: C
         if (result == null || attributeType.isAssignableFrom(clazz)) {
             return clazz.cast(result)
         }
-        throw ClassCastException("Cannot cast " + result.javaClass.name + " to " + attributeType.name + " for map key: " + mapKey);
+        throw ClassCastException("Cannot cast " + result.javaClass.name + " to " + attributeType.name + " for map key: " + mapKey)
     }
 
     private fun getNestedValue(logItem: LogItem): Any? {
@@ -67,6 +66,5 @@ class ParameterizedAttribute<T>(private val mapKey: String, private val clazz: C
     override fun equals(other: Any?): Boolean {
         return super.equals(other) && mapKey == (other as? ParameterizedAttribute<*>)?.mapKey
     }
-
 
 }

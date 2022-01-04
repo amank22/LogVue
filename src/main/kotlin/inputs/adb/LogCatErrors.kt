@@ -2,7 +2,7 @@ package inputs.adb
 
 import java.io.Serializable
 
-sealed class LogCatErrors : Exception(),Serializable {
+sealed class LogCatErrors : Exception(), Serializable {
     companion object {
         private const val serialVersionUID = 1L
     }
