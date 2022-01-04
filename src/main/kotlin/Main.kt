@@ -29,7 +29,6 @@ import java.awt.Desktop
 @Composable
 @Preview
 fun App() {
-//    val packageName = "com.goibibo.debug"
     val processor = remember { MainProcessor() }
     val isLightTheme by Helpers.isThemeLightMode.collectAsState()
     AppTheme(isLightTheme) {
