@@ -12,5 +12,4 @@ object AppSettings {
     fun setFlag(key: String, value: Boolean) {
         Db.configs[key] = value.toString()
     }
-
 }

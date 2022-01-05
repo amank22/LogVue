@@ -60,4 +60,4 @@ sealed class ActionMenu(val text: String, val isPrimary: Boolean, val icon: Stri
 object ActionStart : ActionMenu("Capture logs", isPrimary = true, icon = "icons/ico_play.svg")
 object ActionPause : ActionMenu("Pause capturing", isPrimary = true, icon = "icons/ico_pause.svg")
 object ActionExport : ActionMenu("Export Session Data", isPrimary = false, icon = "icons/ico-share.svg")
-//object ActionFeedback : ActionMenu("Feedback", isPrimary = false, icon = "icons/ico-email.svg")
+// object ActionFeedback : ActionMenu("Feedback", isPrimary = false, icon = "icons/ico-email.svg")

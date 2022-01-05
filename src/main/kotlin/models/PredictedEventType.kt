@@ -23,7 +23,6 @@ object EventTypeLogIn : PredictedEventType("LogIn", "icons/log-in.svg")
 object EventTypeLogOut : PredictedEventType("LogOut", "icons/log-out.svg")
 object EventTypeNotSure : PredictedEventType("Other", "icons/activity.svg")
 
-
 val predictionPropertiesMap = hashMapOf<String, PredictedEventType>().apply {
     put("clicked", EventTypeClick)
     put(" click", EventTypeClick)

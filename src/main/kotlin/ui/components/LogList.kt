@@ -39,12 +39,12 @@ fun LogList(
     }
 }
 
-//@OptIn(ExperimentalComposeUiApi::class)
-//private fun handleArrowKeyScroll(
+// @OptIn(ExperimentalComposeUiApi::class)
+// private fun handleArrowKeyScroll(
 //    keyEvent: KeyEvent,
 //    state: LazyListState,
 //    scope: CoroutineScope
-//): Boolean {
+// ): Boolean {
 //    return when (keyEvent.key) {
 //        Key.DirectionUp -> {
 //            scope.launch {
@@ -62,4 +62,4 @@ fun LogList(
 //            false
 //        }
 //    }
-//}
+// }
