@@ -27,7 +27,7 @@ import ui.CustomTheme
 
 @Composable
 fun DetailCard(logItem: LogItem, modifier: Modifier = Modifier, onCloseClick: () -> Unit) {
-    val text = logItem.propertiesAString ?: AnnotatedString("")
+    val text = logItem.propertiesAString()
     Column(modifier) {
         var copyClicked by remember { mutableStateOf(false) }
         DetailHeader(logItem, Modifier.fillMaxWidth().padding(16.dp), onCloseClick) {

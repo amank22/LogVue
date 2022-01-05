@@ -23,8 +23,8 @@ import ui.components.BodyPanel
 import ui.components.IntroDialog
 import ui.components.SideNavigation
 import utils.APP_NAME
+import utils.AppLog
 import utils.Helpers
-import utils.Log
 import java.awt.Desktop
 
 @Composable
@@ -67,7 +67,7 @@ private fun RemainingItems(state: LazyListState, lastIndex: Int) {
     val fVIOfState = state.firstVisibleItemIndex
     if (lastIndex - fVIOfState < 3) {
         val firstVisibleItemIndex = fVIOfState - state.layoutInfo.visibleItemsInfo.size
-        Log.d("firstVisibleItemIndex", "${lastIndex - firstVisibleItemIndex}")
+        AppLog.d("firstVisibleItemIndex", "${lastIndex - firstVisibleItemIndex}")
     }
 }
 
@@ -85,7 +85,7 @@ private fun ParameterList(list: List<String>, modifier: Modifier) {
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application(false) {
     fun onClose(source: String) {
-        Log.d("QuitHandler", "Quiting : $source")
+        AppLog.d("QuitHandler", "Quiting : $source")
         AdbHelper.close()
         Db.close()
     }

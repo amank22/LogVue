@@ -4,7 +4,7 @@ import java.util.logging.Level
 import java.util.logging.LogRecord
 import java.util.logging.SimpleFormatter
 
-object Log {
+object AppLog {
 
     private val formatter = SimpleFormatter()
 

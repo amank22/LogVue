@@ -27,6 +27,7 @@ import models.LogItem
 import models.SourceInternalContent
 import processor.MainProcessor
 import ui.CustomTheme
+import utils.AppSettings
 
 @Composable
 fun BodyPanel(
@@ -36,11 +37,20 @@ fun BodyPanel(
 ) {
     val logItems = remember(sessionId) { mutableStateListOf<LogItem>() }
     var streamRunning by remember(sessionId) { mutableStateOf(false) }
-    Column(modifier) {
-        val scope = rememberCoroutineScope()
-        val state = rememberSaveable(saver = LazyListState.Saver, key = sessionId) {
-            LazyListState()
+    val scope = rememberCoroutineScope()
+    val state = rememberSaveable(saver = LazyListState.Saver, key = sessionId) {
+        LazyListState()
+    }
+
+    fun scrollToTop() {
+        if (logItems.isNotEmpty()) {
+            scope.launch {
+                state.scrollToItem((logItems.size - 1).coerceAtLeast(0))
+            }
         }
+    }
+
+    Column(modifier) {
         var actionMenuItems by remember(sessionId) { mutableStateOf(ActionMenu.DefaultList) }
         val currentDevice by Devices.currentDeviceFlow.collectAsState()
         var errorString by remember(currentDevice) {
@@ -48,6 +58,10 @@ fun BodyPanel(
         }
         val onNewMessage: (msg: List<LogItem>) -> Unit = { msg ->
             logItems.addAll(msg)
+//            AppLog.d("Got Message", msg.toString())
+            if (AppSettings.getFlagOr(AppSettings.AUTO_SCROLL, true)) {
+                scrollToTop()
+            }
         }
         val onError: (logError: LogCatErrors) -> Unit = {
             actionMenuItems = ActionMenu.DefaultList
@@ -77,11 +91,7 @@ fun BodyPanel(
         fun oldStreamFun(filterQuery: String? = null) {
             fetchOldData(processor, scope, filterQuery) {
                 onNewMessage(it)
-                if (logItems.isNotEmpty()) {
-                    scope.launch {
-                        state.scrollToItem((logItems.size - 1).coerceAtLeast(0))
-                    }
-                }
+                scrollToTop()
             }
         }
         BodyHeader(
@@ -268,7 +278,6 @@ private fun streamData(
 ) {
     scope.launch {
         processor.observeNewStream(onError) { msg ->
-//                    Log.d("Got Message" , msg)
             onMessage(msg)
         }
     }

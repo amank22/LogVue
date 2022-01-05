@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import ui.CustomTheme
+import utils.AppSettings
 import utils.Helpers
 
 @Composable
@@ -49,6 +50,7 @@ fun GeneralSettingBlock(modifier: Modifier = Modifier) {
             painterResource("icons/Tornado.svg")
         ) {
             isAutoScroll = it
+            AppSettings.setFlag(AppSettings.AUTO_SCROLL, it)
         }
     }
 }
