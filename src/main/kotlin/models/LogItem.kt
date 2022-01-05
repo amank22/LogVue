@@ -64,7 +64,7 @@ data class LogItem(
     @Transient
     var isSelected: Boolean = false
 
-    fun buildKey() = "${iKey()}_${localTime}"
+    fun buildKey() = "${iKey()}_$localTime"
     fun key() = id
 
     private fun iKey(): String {

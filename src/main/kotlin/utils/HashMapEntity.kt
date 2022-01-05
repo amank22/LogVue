@@ -18,5 +18,4 @@ class HashMapEntity<K, V> : HashMap<K, V>() {
             return hashCode
         }
     }
-
 }
