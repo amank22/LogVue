@@ -1,5 +1,6 @@
 package processor
 
+import com.android.ddmlib.Log
 import inputs.adb.AndroidLogStreamer
 import inputs.adb.LogCatErrors
 import inputs.adb.LogErrorNoSession
@@ -10,8 +11,8 @@ import kotlinx.coroutines.withContext
 import models.LogItem
 import models.SessionInfo
 import storage.Db
+import utils.AppLog
 import utils.Helpers
-import utils.Log
 import utils.failureOrNull
 import utils.getOrNull
 
@@ -83,7 +84,8 @@ class MainProcessor {
                 .filterNotNull()
                 .mapNotNull { logCatMessage2s ->
                     logCatMessage2s.filter {
-                        Helpers.validateFALogString(it.message) && it.header.logLevel != com.android.ddmlib.Log.LogLevel.ERROR
+                        Helpers.validateFALogString(it.message) &&
+                                it.header.logLevel != Log.LogLevel.ERROR
                     }.map {
                         Helpers.parseFALogs(it)
                     }
@@ -115,7 +117,8 @@ class MainProcessor {
         val fQuery = filterQuery?.trim()
         logItemStream.collect { list ->
             val filterResult = if (fQuery.isNullOrBlank() || fQuery == QUERY_PREFIX) {
-                filterLogs(indexedCollection, list, parser, "Select * from logs")
+                registerPropertiesInParser(list, parser)
+                list
             } else {
                 try {
                     filterLogs(indexedCollection, list, parser, fQuery)
@@ -136,7 +139,7 @@ class MainProcessor {
         try {
             streamer.stop()
         } catch (e: Exception) {
-            Log.d("unnecessary", "keeping exception for now in pause")
+            AppLog.d("unnecessary", "keeping exception for now in pause")
         }
     }
 }

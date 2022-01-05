@@ -8,9 +8,7 @@ import androidx.compose.ui.text.withStyle
 import com.github.drapostolos.typeparser.GenericType
 import com.github.drapostolos.typeparser.TypeParser
 import kotlinx.coroutines.flow.MutableStateFlow
-import models.LogCatMessage2
-import models.LogItem
-import models.SourceFA
+import models.*
 import org.snakeyaml.engine.v2.api.Dump
 import org.snakeyaml.engine.v2.api.DumpSettings
 import org.snakeyaml.engine.v2.api.StreamDataWriter
@@ -189,7 +187,7 @@ object Helpers {
             val dump = Dump(settings)
             dump.dump(properties, YamlWriter(printWriter))
         } catch (e: Exception) {
-            Log.d("YamlConverter", e.localizedMessage)
+            AppLog.d("YamlConverter", e.localizedMessage)
         }
     }
 
@@ -198,7 +196,7 @@ object Helpers {
             val dump = Dump(settings)
             dump.dump(properties, streamDataWriter)
         } catch (e: Exception) {
-            Log.d("YamlConverter", e.localizedMessage)
+            AppLog.d("YamlConverter", e.localizedMessage)
         }
     }
 
@@ -287,7 +285,7 @@ object Helpers {
             }
             Runtime.getRuntime().exec(command)
         } catch (e: Exception) {
-            Log.d("failed to open file manager")
+            AppLog.d("failed to open file manager")
         }
     }
 
@@ -302,9 +300,43 @@ object Helpers {
             Desktop.isDesktopSupported() && desktop.isSupported(Desktop.Action.BROWSE) -> desktop.browse(uri)
             "mac" in osName -> Runtime.getRuntime().exec("open $uri")
             "nix" in osName || "nux" in osName -> Runtime.getRuntime().exec("xdg-open $uri")
-            else -> throw RuntimeException("cannot open $uri")
+            else -> throw IllegalArgumentException("cannot open $uri")
         }
+    }
+
+    /**
+     * This tries to predict the event type but there is no guarantee of very high accuracy.
+     * If shown to user, specify that this is just mere a possibility
+     * @return event type or not sure if nothing can be predicted
+     */
+    fun predictEventType(logItem: LogItem): PredictedEventType {
+        with(logItem) {
+            predictionEventNameMap.forEach loop@{ (mKey, mValue) ->
+                if (eventName.contains(mKey, true)) {
+                    return mValue
+                }
+            }
+            return findTypeInEventValue() ?: EventTypeNotSure
+        }
+    }
+
+    private fun LogItem.findTypeInEventValue(): PredictedEventType? {
+        properties.forEach { (_, u) ->
+            if (u !is String) return@forEach
+            val value = u.toString()
+            var type: PredictedEventType? = null
+            predictionPropertiesMap.forEach loop@{ (mKey, mValue) ->
+                if (value.contains(mKey, true)) {
+                    type = mValue
+                    return@loop
+                }
+            }
+            if (type != null) {
+                return type
+            }
+        }
+        return null
     }
 }
 
-public inline fun <K, V> hashMapEntityOf(): HashMap<K, V> = HashMapEntity<K, V>()
+fun <K, V> hashMapEntityOf(): HashMap<K, V> = HashMapEntity()

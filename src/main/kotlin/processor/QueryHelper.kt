@@ -8,7 +8,7 @@ import com.googlecode.cqengine.index.radixinverted.InvertedRadixTreeIndex
 import com.googlecode.cqengine.index.radixreversed.ReversedRadixTreeIndex
 import com.googlecode.cqengine.query.parser.sql.SQLParser
 import models.LogItem
-import utils.Log
+import utils.AppLog
 import kotlin.reflect.KProperty1
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
@@ -47,11 +47,16 @@ fun filterLogs(
     val filterResult = measureTimedValue {
         parser.retrieve(indexedCollection, filterQuery)
     }
-    Log.d("filtering", "Time taken: ${filterResult.duration} , Retrieval Cost: ${filterResult.value.retrievalCost}")
+    if (filterResult.duration.inWholeSeconds > 2) {
+        AppLog.d(
+            "filtering", "Time taken: ${filterResult.duration} , " +
+                    "Retrieval Cost: ${filterResult.value.retrievalCost}"
+        )
+    }
     return filterResult.value.toList().sortedBy { it.localTime }
 }
 
-private fun registerPropertiesInParser(
+fun registerPropertiesInParser(
     list: List<LogItem>,
     parser: SQLParser<LogItem>
 ) {
@@ -77,7 +82,7 @@ private fun registerMapPropertiesInParser(
                     parser, "$parentKey$k."
                 )
             } else {
-                println("Attribute : ${att.attributeName} with first value = $v and v class = ${v.javaClass.name}")
+//                println("Attribute : ${att.attributeName} with first value = $v and v class = ${v.javaClass.name}")
                 parser.registerAttribute(att)
                 propertySet.add(k)
             }

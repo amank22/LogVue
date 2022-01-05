@@ -49,6 +49,6 @@ private fun ListItemEmptyContent(noLogsContent: NoLogsContent, modifier: Modifie
 @Composable
 private fun ListErrorContent(errorContent: ErrorContent, modifier: Modifier = Modifier) {
     Card(modifier) {
-        Text(errorContent.error)
+        Text(errorContent.error, Modifier.padding(16.dp), textAlign = TextAlign.Center)
     }
 }

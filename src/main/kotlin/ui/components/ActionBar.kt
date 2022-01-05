@@ -51,13 +51,13 @@ private fun ButtonContent(
 
 sealed class ActionMenu(val text: String, val isPrimary: Boolean, val icon: String = "") {
     companion object {
-        val DefaultList = arrayListOf(ActionStart, ActionExport, ActionFeedback)
-        val PauseList = arrayListOf(ActionPause, ActionExport, ActionFeedback)
+        val DefaultList = arrayListOf(ActionStart, ActionExport)
+        val PauseList = arrayListOf(ActionPause, ActionExport)
     }
 }
 
 // TODO: Add enable flag to disable button when maybe device is not connected or there is no data to export
-object ActionStart : ActionMenu("Start", isPrimary = true, icon = "icons/ico_play.svg")
-object ActionPause : ActionMenu("Pause", isPrimary = true, icon = "icons/ico_pause.svg")
+object ActionStart : ActionMenu("Capture logs", isPrimary = true, icon = "icons/ico_play.svg")
+object ActionPause : ActionMenu("Pause capturing", isPrimary = true, icon = "icons/ico_pause.svg")
 object ActionExport : ActionMenu("Export Session Data", isPrimary = false, icon = "icons/ico-share.svg")
-object ActionFeedback : ActionMenu("Feedback", isPrimary = false, icon = "icons/ico-email.svg")
+//object ActionFeedback : ActionMenu("Feedback", isPrimary = false, icon = "icons/ico-email.svg")
