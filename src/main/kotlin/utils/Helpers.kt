@@ -1,12 +1,13 @@
 package utils
 
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.unit.sp
 import com.github.drapostolos.typeparser.GenericType
 import com.github.drapostolos.typeparser.TypeParser
+import com.google.gson.GsonBuilder
+import com.google.gson.ToNumberPolicy
 import kotlinx.coroutines.flow.MutableStateFlow
 import models.*
 import org.snakeyaml.engine.v2.api.Dump
@@ -37,6 +38,12 @@ object Helpers {
             .build()
     }
 
+    private val gson by lazy {
+        val gsonBuilder = GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
+        gsonBuilder.setPrettyPrinting()
+        gsonBuilder.create()
+    }
+
     val isThemeLightMode = MutableStateFlow(Db.configs["isThemeLightMode"]?.toBooleanStrictOrNull() ?: true)
 
     fun switchThemes(isLightMode: Boolean) {
@@ -46,18 +53,8 @@ object Helpers {
 
     fun validateFALogString(rawText: String): Boolean {
         if (rawText.isBlank()) return false
-//        val firstIndexOfClose = rawText.indexOfFirst { it == ']' }
-//        if (firstIndexOfClose == -1) return false
-//        val logText = rawText.substring(firstIndexOfClose + 1).trim()
         if (!rawText.startsWith(faPrefix)) return false
         return true
-    }
-
-    fun cutLogString(rawText: String): String {
-        val firstIndexOfClose = rawText.indexOfFirst { it == ']' }
-        val trim = rawText.substring(firstIndexOfClose + 1).trim()
-//        println("trimmed : $trim")
-        return trim
     }
 
     /*
@@ -203,15 +200,46 @@ object Helpers {
         }
     }
 
+    fun propertiesAnnotatedString(properties: Map<String, Any>, indent: Int = 4): AnnotatedString {
+        return buildAnnotatedString {
+            val textIndent = TextIndent(indent.sp, indent.sp)
+            var paraIndex = pushStyle(ParagraphStyle(lineHeight = 18.sp, textIndent = textIndent))
+            var counter = 0
+            val mapSize = properties.size
+            properties.forEach { (key, value) ->
+                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                    append(key)
+                }
+                append(" : ")
+                if (value is Map<*, *>) {
+                    pop(paraIndex)
+                    val childIndent = indent + 4
+                    val childProperties = value as? HashMap<String, Any> ?: hashMapOf()
+                    val childString = propertiesAnnotatedString(childProperties, childIndent)
+//                    append("\n")
+                    append(childString)
+                    paraIndex = pushStyle(ParagraphStyle(lineHeight = 18.sp, textIndent = textIndent))
+                } else {
+                    append(value.toString())
+                }
+                counter++
+                if (counter != mapSize) {
+                    append(System.lineSeparator())
+                }
+            }
+            pop(paraIndex)
+        }
+    }
+
     @Suppress("UNCHECKED_CAST")
     fun createAnnotatedString(properties: Map<String, Any>, indent: Int = 0): AnnotatedString {
         return buildAnnotatedString {
             var counter = 0
             val mapSize = properties.size
             properties.forEach { (key, value) ->
-                append(buildString {
+                append(buildString { // temporary workaround for indentation cuz of no nested paragraph
                     if (indent == 0) return@buildString
-                    for (i in 0 until indent) {
+                    (0 until indent).forEach { _ ->
                         append(" ")
                     }
                 })
@@ -230,10 +258,15 @@ object Helpers {
                 }
                 counter++
                 if (counter != mapSize) {
-                    append("\n\n")
+                    append("\n")
                 }
             }
         }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun createJsonString(properties: Map<String, Any>): String {
+        return gson.toJson(properties)
     }
 
     /**

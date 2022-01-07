@@ -54,7 +54,7 @@ data class LogItem(
         if (_propertiesAString == null) {
             synchronized(lock) {
                 if (_propertiesAString == null) {
-                    _propertiesAString = Helpers.createAnnotatedString(properties)
+                    _propertiesAString = Helpers.propertiesAnnotatedString(properties)
                 }
             }
         }

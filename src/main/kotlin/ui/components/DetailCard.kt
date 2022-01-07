@@ -1,14 +1,12 @@
 package ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,30 +16,49 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Popup
+import kotlinx.coroutines.launch
 import models.LogItem
 import ui.CustomTheme
 
 @Composable
 fun DetailCard(logItem: LogItem, modifier: Modifier = Modifier, onCloseClick: () -> Unit) {
     val text = logItem.propertiesAString()
+//    val text = Helpers.createJsonString(logItem.properties)
     Column(modifier) {
         var copyClicked by remember { mutableStateOf(false) }
         DetailHeader(logItem, Modifier.fillMaxWidth().padding(16.dp), onCloseClick) {
             copyClicked = true
         }
-        if (copyClicked) {
-            val copyText = AnnotatedString(logItem.eventName + "\n\n") + text
-            LocalClipboardManager.current.setText(copyText)
-            Popup { Text("Text Copied") } // TODO: Change this to inline or something else
-        }
         Divider(Modifier.padding(horizontal = 16.dp).fillMaxWidth(), Color.Gray)
         val scrollState = rememberScrollState()
-        SelectionContainer {
-            Text(text, Modifier.padding(16.dp).fillMaxHeight().verticalScroll(scrollState), lineHeight = 8.sp)
+        val scaffoldState = rememberScaffoldState()
+        val scope = rememberCoroutineScope()
+        if (copyClicked) {
+            val copyText = logItem.eventName + "\n\n" + text
+            LocalClipboardManager.current.setText(AnnotatedString(copyText))
+            scope.launch {
+                scaffoldState.snackbarHostState.showSnackbar("Text Copied")
+            }
+        }
+        Scaffold(
+            modifier, scaffoldState = scaffoldState,
+            backgroundColor = CustomTheme.colors.componentBackground
+        ) {
+            SelectionContainer(
+                Modifier.padding(16.dp)
+                    .verticalScroll(scrollState)
+                    .horizontalScroll(rememberScrollState())
+            ) {
+                Text(
+                    text,
+                    fontFamily = FontFamily.Monospace, softWrap = false,
+                    overflow = TextOverflow.Visible
+                )
+            }
         }
     }
 }
