@@ -23,8 +23,6 @@ fun LogList(
     state: LazyListState = rememberLazyListState(),
     onClick: (logItem: LogItem) -> Unit
 ) {
-//    val scope = rememberCoroutineScope()
-    //    RemainingItems(state, lastIndex)
     LazyColumn(
         modifier, reverseLayout = true, state = state, verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(24.dp, 0.dp, 24.dp, 24.dp)
@@ -38,28 +36,3 @@ fun LogList(
         }
     }
 }
-
-// @OptIn(ExperimentalComposeUiApi::class)
-// private fun handleArrowKeyScroll(
-//    keyEvent: KeyEvent,
-//    state: LazyListState,
-//    scope: CoroutineScope
-// ): Boolean {
-//    return when (keyEvent.key) {
-//        Key.DirectionUp -> {
-//            scope.launch {
-//                state.animateScrollBy(-50f)
-//            }
-//            true
-//        }
-//        Key.DirectionDown -> {
-//            scope.launch {
-//                state.animateScrollBy(50f)
-//            }
-//            true
-//        }
-//        else -> {
-//            false
-//        }
-//    }
-// }

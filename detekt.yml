@@ -103,7 +103,7 @@ complexity:
     constructorThreshold: 7
     ignoreDefaultParameters: false
     ignoreDataClasses: true
-    ignoreAnnotated: [ ]
+    ignoreAnnotated: [ 'Composable' ]
   MethodOverloading:
     active: false
     threshold: 6
@@ -570,7 +570,7 @@ style:
     active: false
     includeLineWrapping: false
   ForbiddenComment:
-    active: true
+    active: false
     values: [ 'TODO:', 'FIXME:', 'STOPSHIP:' ]
     allowedPatterns: ''
   ForbiddenImport:

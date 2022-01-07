@@ -35,15 +35,14 @@ fun GeneralSettingBlock(modifier: Modifier = Modifier) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
         ItemHeader("General")
         var isDarkMode by remember { mutableStateOf(!Helpers.isThemeLightMode.value) }
-        SwitchItem(
+        DarkModeSwitchItem(
             isDarkMode, "Dark Mode", Modifier.fillMaxWidth(),
-            "Enable dark mode for less strain on eyes",
-            painterResource("icons/DarkMode.svg")
+            "Enable dark mode for less strain on eyes"
         ) {
             isDarkMode = it
             Helpers.switchThemes(!it)
         }
-        var isAutoScroll by remember { mutableStateOf(false) }
+        var isAutoScroll by remember { mutableStateOf(AppSettings.getFlag(AppSettings.AUTO_SCROLL)) }
         SwitchItem(
             isAutoScroll, "Auto Scroll logs", Modifier.fillMaxWidth(),
             "When recording, auto-scroll to the latest incoming analytics logs",

@@ -68,14 +68,17 @@ object Helpers {
         val cut1 = rawText.removePrefix(faPrefix)
         val eventParamsCutter = cut1.split(Regex(","), 2)
         val eventName = eventParamsCutter[0].trim()
-        val properties = hashMapEntityOf<String, Any>()
+        val properties = hashMapOf<String, Any>()
         eventParamsCutter.getOrNull(1)?.trim()?.let {
             val objectItem = Item.ObjectItem(it.trim())
             val something = objectMapper.parse(objectItem) as HashMap<out String, Any>
             properties.putAll(something)
         }
         val time = msg.header.timestamp.toEpochMilli()
-        return LogItem(source = SourceFA, eventName = eventName, properties = properties, localTime = time)
+        return LogItem(
+            source = SourceFA, eventName = eventName,
+            properties = hashMapEntityOf(properties), localTime = time
+        )
     }
 
     fun tryParseToType(str: String?): Any? {
@@ -191,7 +194,7 @@ object Helpers {
         }
     }
 
-    fun convertToYaml(properties: HashMap<String, Any>, streamDataWriter: StreamDataWriter) {
+    fun convertToYaml(properties: Map<String, Any>, streamDataWriter: StreamDataWriter) {
         try {
             val dump = Dump(settings)
             dump.dump(properties, streamDataWriter)
@@ -201,7 +204,7 @@ object Helpers {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun createAnnotatedString(properties: HashMap<String, Any>, indent: Int = 0): AnnotatedString {
+    fun createAnnotatedString(properties: Map<String, Any>, indent: Int = 0): AnnotatedString {
         return buildAnnotatedString {
             var counter = 0
             val mapSize = properties.size
@@ -339,4 +342,4 @@ object Helpers {
     }
 }
 
-fun <K, V> hashMapEntityOf(): HashMap<K, V> = HashMapEntity()
+fun <K, V> hashMapEntityOf(mapToWrap: MutableMap<K, V>): HashMapEntity<K, V> = HashMapEntity(mapToWrap)

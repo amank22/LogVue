@@ -35,6 +35,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.googlecode.cqengine/cqengine
     implementation("com.googlecode.cqengine:cqengine:3.6.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
+    implementation("com.halilibo.compose-richtext:richtext-ui-material:0.10.0")
 }
 
 tasks.test {

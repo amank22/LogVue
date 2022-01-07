@@ -116,7 +116,7 @@ fun LogIcon(logItem: LogItem, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun HorizontalFlow(properties: HashMap<String, Any>) {
+private fun HorizontalFlow(properties: Map<String, Any>) {
     FlowRow(mainAxisSpacing = 4.dp, crossAxisSpacing = 4.dp) {
         properties.keys.take(n = 6).forEach {
             val key = it

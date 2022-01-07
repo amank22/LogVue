@@ -45,24 +45,33 @@ fun StyledCustomVerticalDialog(onDismissRequest: () -> Unit, content: @Composabl
 }
 
 @Composable
-fun SimpleVerticalDialog(header: String, onDismissRequest: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+fun SimpleVerticalDialog(
+    header: String,
+    onDismissRequest: () -> Unit,
+    paddingValues: PaddingValues = PaddingValues(16.dp),
+    content: @Composable ColumnScope.() -> Unit
+) {
     CustomDialog(
         dialogWidthRatio = 0.28f,
         dialogHeightRatio = 0.56f, onDismissRequest = onDismissRequest
     ) {
-        Column(Modifier.fillMaxSize().padding(16.dp)) {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(header, Modifier.weight(1f), style = CustomTheme.typography.headings.h2)
+        Column(Modifier.fillMaxSize()) {
+            Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                val hColor = if (MaterialTheme.colors.isLight) Color.Black else Color.White
+                Text(
+                    header, Modifier.weight(1f), style = CustomTheme.typography.headings.h2,
+                    color = hColor
+                )
                 IconButton(
                     onDismissRequest, Modifier.size(36.dp)
                 ) {
                     Icon(painterResource("icons/ico_close.xml"), "Close")
                 }
             }
-            Spacer(Modifier.height(16.dp))
             Divider(color = CustomTheme.colors.componentOutline, thickness = (0.5).dp)
-            Spacer(Modifier.height(16.dp))
-            content()
+            Column(Modifier.fillMaxSize().padding(paddingValues)) {
+                content()
+            }
         }
     }
 }

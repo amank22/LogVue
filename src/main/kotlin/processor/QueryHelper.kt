@@ -1,6 +1,7 @@
 package processor
 
 import com.googlecode.cqengine.ConcurrentIndexedCollection
+import com.googlecode.cqengine.ObjectLockingIndexedCollection
 import com.googlecode.cqengine.attribute.support.FunctionalSimpleAttribute
 import com.googlecode.cqengine.index.hash.HashIndex
 import com.googlecode.cqengine.index.radix.RadixTreeIndex
@@ -20,7 +21,7 @@ inline fun <reified O, reified A> attribute(name: String, accessor: KProperty1<O
 }
 
 fun queryCollection(): ConcurrentIndexedCollection<LogItem> {
-    return ConcurrentIndexedCollection<LogItem>().apply {
+    return ObjectLockingIndexedCollection<LogItem>().apply {
         addIndex(HashIndex.onAttribute(LogItem.EVENT_NAME))
         addIndex(RadixTreeIndex.onAttribute(LogItem.EVENT_NAME))
         addIndex(InvertedRadixTreeIndex.onAttribute(LogItem.EVENT_NAME))
@@ -31,7 +32,6 @@ fun queryCollection(): ConcurrentIndexedCollection<LogItem> {
 fun sqlParser(): SQLParser<LogItem> {
     return SQLParser.forPojo(LogItem::class.java).apply {
         registerAttribute(LogItem.EVENT_NAME)
-        registerAttribute(LogItem.PROPERTY)
     }
 }
 
@@ -44,6 +44,7 @@ fun filterLogs(
 ): List<LogItem> {
     indexedCollection.addAll(list)
     registerPropertiesInParser(list, parser)
+    println("Filtering logs")
     val filterResult = measureTimedValue {
         parser.retrieve(indexedCollection, filterQuery)
     }
@@ -53,7 +54,9 @@ fun filterLogs(
                     "Retrieval Cost: ${filterResult.value.retrievalCost}"
         )
     }
-    return filterResult.value.toList().sortedBy { it.localTime }
+    val toList = filterResult.value.toList()
+    AppLog.d("filterResult", filterResult.value.toList().toString())
+    return toList.sortedBy { it.localTime }
 }
 
 fun registerPropertiesInParser(
