@@ -3,8 +3,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.31"
-    id("org.jetbrains.compose") version "1.0.0"
+    kotlin("jvm") version "1.6.10"
+    id("org.jetbrains.compose") version "1.0.1"
 }
 
 group = "com.gi"
@@ -35,6 +35,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.googlecode.cqengine/cqengine
     implementation("com.googlecode.cqengine:cqengine:3.6.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
+    implementation("com.halilibo.compose-richtext:richtext-ui-material:0.10.0")
 }
 
 tasks.test {

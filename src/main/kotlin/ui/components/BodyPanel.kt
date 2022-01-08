@@ -1,26 +1,29 @@
 package ui.components
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.LocalScrollbarStyle
-import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.background
+import androidx.compose.animation.*
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import inputs.adb.*
+import inputs.adb.CancelException
+import inputs.adb.LogCatErrors
 import inputs.adb.ddmlib.Devices
+import inputs.adb.logcatErrorString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import models.LogItem
@@ -50,50 +53,33 @@ fun BodyPanel(
         }
     }
 
+    val onNewMessage: (msg: List<LogItem>) -> Unit = { msg ->
+        logItems.addAll(msg)
+        if (AppSettings.getFlag(AppSettings.AUTO_SCROLL)) {
+            scrollToTop()
+        }
+    }
+
+    fun oldStreamFun(filterQuery: String? = null) {
+        fetchOldData(processor, scope, filterQuery) {
+            onNewMessage(it)
+            scrollToTop()
+        }
+    }
+
     Column(modifier) {
         var actionMenuItems by remember(sessionId) { mutableStateOf(ActionMenu.DefaultList) }
         val currentDevice by Devices.currentDeviceFlow.collectAsState()
         var errorString by remember(currentDevice) {
             mutableStateOf(if (currentDevice == null) "No device is connected" else "")
         }
-        val onNewMessage: (msg: List<LogItem>) -> Unit = { msg ->
-            logItems.addAll(msg)
-//            AppLog.d("Got Message", msg.toString())
-            if (AppSettings.getFlagOr(AppSettings.AUTO_SCROLL, true)) {
-                scrollToTop()
-            }
-        }
+
         val onError: (logError: LogCatErrors) -> Unit = {
             actionMenuItems = ActionMenu.DefaultList
             streamRunning = false
-            errorString = when (it) {
-                is LogErrorADBIssue -> {
-                    "There is some issue with device. Check if your device is connected and your app is running"
-                }
-                is LogErrorDeviceNotConnected -> {
-                    "Please connect your device or start an emulator"
-                }
-                is LogErrorNoSession -> {
-                    "Create a new session to start logging data"
-                }
-                is LogErrorNotEnabledForFA -> {
-                    "Unable to enable logs for firebase"
-                }
-                is LogErrorPackageIssue -> {
-                    "The app might not be installed or app processed is not running on the device. Please check."
-                }
-                is LogErrorUnknown -> {
-                    "This is some unknown error in collecting logs. \n ${it.exception.localizedMessage}"
-                }
-            }
+            errorString = logcatErrorString(it)
         }
 
-        fun oldStreamFun(filterQuery: String? = null) {
-            fetchOldData(processor, scope, filterQuery) {
-                onNewMessage(it)
-                scrollToTop()
-            }
-        }
         BodyHeader(
             sessionId,
             Modifier.fillMaxWidth().background(CustomTheme.colors.componentBackground),
@@ -143,7 +129,7 @@ fun BodyPanel(
                 }
             }
         }
-        MainBodyContent(logItems, Modifier.fillMaxSize(), streamRunning, sessionId, state)
+        MainBodyContent(logItems, Modifier.fillMaxSize(), sessionId, state)
         LaunchedEffect(sessionId) {
             oldStreamFun()
         }
@@ -171,7 +157,6 @@ private fun ErrorBar(errorString: String) {
 private fun MainBodyContent(
     logItems: SnapshotStateList<LogItem>,
     modifier: Modifier = Modifier,
-    streamRunning: Boolean = false,
     sessionId: String?,
     state: LazyListState
 ) {
@@ -179,8 +164,7 @@ private fun MainBodyContent(
     Row(modifier) {
         var selectedItem by remember(sessionId) { mutableStateOf<LogItem?>(null) }
         LogListView(
-            logItems, state, lastIndex, streamRunning,
-            Modifier.fillMaxHeight().weight(0.6f)
+            logItems, state, lastIndex, Modifier.fillMaxHeight().weight(0.6f)
         ) {
             selectedItem?.isSelected = false
             selectedItem = it
@@ -224,7 +208,6 @@ private fun LogListView(
     logItems: SnapshotStateList<LogItem>,
     state: LazyListState,
     lastIndex: Int,
-    streamRunning: Boolean,
     modifier: Modifier,
     onClick: (logItem: LogItem) -> Unit
 ) {
@@ -240,7 +223,7 @@ private fun LogListView(
                 style = LocalScrollbarStyle.current.copy(minimalHeight = 24.dp)
             )
             if (isHaveLogItems(logItems)) {
-                PortalToTopButton(state, lastIndex, Modifier.align(Alignment.BottomEnd).padding(24.dp))
+                PortalToTopButton(state, lastIndex, Modifier.align(Alignment.TopCenter).padding(8.dp))
             }
         } else {
             LoadingAnimation(Modifier.align(Alignment.Center))
@@ -256,18 +239,38 @@ fun LoadingAnimation(modifier: Modifier = Modifier) {
 @Composable
 private fun PortalToTopButton(state: LazyListState, lastIndex: Int, modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
-    ExtendedFloatingActionButton({
-        Text("Scroll to Top")
-    }, {
-        scope.launch {
-            state.animateScrollToItem(lastIndex)
+    val firstVisibleItemIndex = state.firstVisibleItemIndex
+    val itemsAtTop = lastIndex - firstVisibleItemIndex
+
+    val m1 = modifier
+        .clip(CustomTheme.shapes.small)
+        .clickable {
+            scope.launch {
+                state.animateScrollToItem(lastIndex)
+            }
         }
-    }, modifier, {
-        Icon(
-            painterResource("icons/ico-carrot-right.svg"), "scroll up",
-            Modifier.rotate(-90f)
-        )
-    })
+        .graphicsLayer(shadowElevation = 8.dp.value, clip = true)
+        .background(CustomTheme.colors.highContrast, CustomTheme.shapes.small)
+        .padding(horizontal = 8.dp, vertical = 4.dp)
+    AnimatedVisibility(
+        itemsAtTop > 6, m1,
+        enter = fadeIn() + slideInVertically(),
+        exit = fadeOut() + slideOutVertically()
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "$itemsAtTop", style = CustomTheme.typography.headings.h6,
+                color = CustomTheme.colors.componentBackground2
+            )
+            Icon(
+                painterResource("icons/ico-carrot-right.svg"), "scroll up",
+                Modifier.size(16.dp).rotate(-90f),
+                tint = CustomTheme.colors.componentBackground2
+            )
+        }
+    }
 }
 
 private fun streamData(

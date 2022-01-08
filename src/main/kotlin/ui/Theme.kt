@@ -14,6 +14,8 @@ import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import utils.EnglishStringRes
+import utils.StringRes
 
 @Composable
 fun AppTheme(isLightTheme: Boolean = true, content: @Composable () -> Unit) =
@@ -52,6 +54,11 @@ data class CustomElevation(
     val pressed: Dp
 )
 
+@Immutable
+data class CustomResources(
+    val strings: StringRes
+)
+
 val LocalCustomColors = staticCompositionLocalOf {
     CustomColors()
 }
@@ -60,7 +67,7 @@ val LocalCustomTypography = staticCompositionLocalOf {
         body = TextStyle.Default,
         bodySmall = TextStyle.Default,
         title = TextStyle.Default,
-        headings = CustomHeading()
+        headings = CustomHeading(null)
     )
 }
 val LocalCustomElevation = staticCompositionLocalOf {
@@ -71,6 +78,9 @@ val LocalCustomElevation = staticCompositionLocalOf {
 }
 val LocalCustomShape = staticCompositionLocalOf {
     Shapes()
+}
+val LocalCustomResources = staticCompositionLocalOf {
+    CustomResources(EnglishStringRes())
 }
 
 @Composable
@@ -88,36 +98,12 @@ fun CustomTheme(
         danger = Color(0xFFDC3545),
         success = Color(0xFF28A745)
     )
-    val customColors = if (isLightTheme) {
-        CustomColors(
-            background = Color(0xFFF5F5F5),
-            componentBackground = Color.White,
-            componentBackground2 = Color(0xFFF9F9F9),
-            highContrast = Color(0xFF364A59),
-            mediumContrast = Color(0xFF566976),
-            lowContrast = Color(0xFFACBAC3),
-            accent = Color(0xFF31AAB7),
-            alertColors = alertColors,
-            componentOutline = Color(0xFFDAE2E8)
-        )
-    } else {
-        CustomColors(
-            background = Color(0xFF2E3438),
-            componentBackground = Color(0xFF111B22),
-            componentBackground2 = Color(0xFF383E42),
-            highContrast = Color.White,
-            mediumContrast = Color(0xFFACBAC3),
-            lowContrast = Color(0xFF566976),
-            accent = Color(0xFF31AAB7),
-            alertColors = alertColors,
-            componentOutline = Color(0xFF3A4349)
-        )
-    }
+    val customColors = customColors(isLightTheme, alertColors)
     val customTypography = CustomTypography(
         body = TextStyle(fontSize = 16.sp, fontFamily = fontFamily),
         bodySmall = TextStyle(fontSize = 12.sp, fontFamily = fontFamily),
         title = TextStyle(fontSize = 32.sp, fontFamily = fontFamily),
-        headings = CustomHeading()
+        headings = CustomHeading(fontFamily)
     )
     val customElevation = CustomElevation(
         default = 4.dp,
@@ -127,6 +113,7 @@ fun CustomTheme(
         small = RoundedCornerShape(8.dp), medium = RoundedCornerShape(8.dp),
         large = RoundedCornerShape(8.dp)
     )
+    val customRes = CustomResources(EnglishStringRes())
     val materialColors = Colors(
         primary = customColors.accent,
         background = customColors.background,
@@ -149,11 +136,38 @@ fun CustomTheme(
             LocalCustomTypography provides customTypography,
             LocalCustomElevation provides customElevation,
             LocalCustomShape provides customShapes,
-            LocalContentColor provides customColors.highContrast
+            LocalContentColor provides customColors.highContrast,
+            LocalCustomResources provides customRes
         ) {
             content()
         }
     }
+}
+
+private fun customColors(isLightTheme: Boolean, alertColors: CustomAlertColors) = if (isLightTheme) {
+    CustomColors(
+        background = Color(0xFFF5F5F5),
+        componentBackground = Color.White,
+        componentBackground2 = Color(0xFFF9F9F9),
+        highContrast = Color(0xFF364A59),
+        mediumContrast = Color(0xFF566976),
+        lowContrast = Color(0xFFACBAC3),
+        accent = Color(0xFF31AAB7),
+        alertColors = alertColors,
+        componentOutline = Color(0xFFDAE2E8)
+    )
+} else {
+    CustomColors(
+        background = Color(0xFF2E3438),
+        componentBackground = Color(0xFF111B22),
+        componentBackground2 = Color(0xFF383E42),
+        highContrast = Color.White,
+        mediumContrast = Color(0xFFACBAC3),
+        lowContrast = Color(0xFF566976),
+        accent = Color(0xFF31AAB7),
+        alertColors = alertColors,
+        componentOutline = Color(0xFF3A4349)
+    )
 }
 
 // Use with eg. CustomTheme.elevation.small
@@ -170,4 +184,10 @@ object CustomTheme {
     val shapes: Shapes
         @Composable
         get() = LocalCustomShape.current
+    val strings: StringRes
+        @Composable
+        get() = LocalCustomResources.current.strings
+    val resources: CustomResources
+        @Composable
+        get() = LocalCustomResources.current
 }

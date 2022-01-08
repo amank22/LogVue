@@ -1,19 +1,20 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.window.WindowDraggableArea
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Divider
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.*
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPlacement
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
 import inputs.adb.ddmlib.AdbHelper
 import processor.MainProcessor
 import storage.Db
@@ -62,26 +63,6 @@ fun LaunchIntroIfNeeded() {
     }
 }
 
-@Composable
-private fun RemainingItems(state: LazyListState, lastIndex: Int) {
-    val fVIOfState = state.firstVisibleItemIndex
-    if (lastIndex - fVIOfState < 3) {
-        val firstVisibleItemIndex = fVIOfState - state.layoutInfo.visibleItemsInfo.size
-        AppLog.d("firstVisibleItemIndex", "${lastIndex - firstVisibleItemIndex}")
-    }
-}
-
-@Composable
-private fun ParameterList(list: List<String>, modifier: Modifier) {
-    LazyColumn(modifier) {
-        items(list, key = { item: String -> item }) {
-            Column {
-                Text(it)
-            }
-        }
-    }
-}
-
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() = application(false) {
     fun onClose(source: String) {
@@ -104,9 +85,4 @@ fun main() = application(false) {
 //        }
         App()
     }
-}
-
-@Composable
-private fun WindowScope.AppWindowTitleBar() = WindowDraggableArea {
-    Box(Modifier.fillMaxWidth().height(24.dp).background(Color.White))
 }

@@ -29,7 +29,7 @@ class ParameterizedAttribute<T>(private val mapKey: String, private val clazz: C
         if (nSize == 1) {
             return map[mapKey]
         }
-        var innerMap = map
+        var innerMap: Map<String, Any> = map
         var value: Any? = null
         nestedKeys.forEachIndexed { index, it ->
             value = innerMap[it]
@@ -47,7 +47,7 @@ class ParameterizedAttribute<T>(private val mapKey: String, private val clazz: C
             }
             if (index != (nSize - 1)) {
                 @Suppress("UNCHECKED_CAST")
-                innerMap = value as HashMap<String, Any>
+                innerMap = value as Map<String, Any>
             }
         }
         return value

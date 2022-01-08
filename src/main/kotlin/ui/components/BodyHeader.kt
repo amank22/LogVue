@@ -10,9 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -47,7 +45,7 @@ private fun FilterSearchHeader(
 
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
         val m1 = Modifier.weight(1f).padding(horizontal = 20.dp, vertical = 8.dp).onPreviewKeyEvent {
-            if (it.key == Key.Enter) {
+            if (it.key == Key.Enter && it.type == KeyEventType.KeyUp) {
                 sendFilterBack()
                 true
             } else {
@@ -130,15 +128,19 @@ private fun HeaderEndIconsPanel(
                 Icon(painter, "Close", tint = CustomTheme.colors.highContrast)
             }
         }
-        IconButton({}) {
-            val painter = painterResource("icons/ico_info.svg")
+        var filterFaqOpen by remember { mutableStateOf(false) }
+        if (filterFaqOpen) {
+            FilterFaqDialog { filterFaqOpen = false }
+        }
+        IconButton({ filterFaqOpen = true }) {
+            val painter = painterResource("icons/ico-help.svg")
             Icon(painter, "Close", tint = CustomTheme.colors.highContrast)
         }
         Box(Modifier.width(1.dp).fillMaxHeight().background(CustomTheme.colors.lowContrast))
         var showSettingDialog by remember { mutableStateOf(false) }
         IconButton({
             showSettingDialog = true
-        }) { // TODO: Settings
+        }) {
             val painter = painterResource("icons/ico-settings.svg")
             Icon(painter, "Settings", tint = CustomTheme.colors.highContrast)
         }

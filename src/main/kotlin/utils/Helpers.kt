@@ -1,17 +1,18 @@
 package utils
 
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.sp
 import com.github.drapostolos.typeparser.GenericType
 import com.github.drapostolos.typeparser.TypeParser
+import com.google.gson.GsonBuilder
+import com.google.gson.ToNumberPolicy
 import kotlinx.coroutines.flow.MutableStateFlow
 import models.*
 import org.snakeyaml.engine.v2.api.Dump
 import org.snakeyaml.engine.v2.api.DumpSettings
 import org.snakeyaml.engine.v2.api.StreamDataWriter
+import org.snakeyaml.engine.v2.common.FlowStyle
 import org.snakeyaml.engine.v2.common.ScalarStyle
 import processor.YamlWriter
 import storage.Db
@@ -34,7 +35,17 @@ object Helpers {
 
     private val settings by lazy {
         DumpSettings.builder().setDefaultScalarStyle(ScalarStyle.PLAIN)
+            .setBestLineBreak(System.lineSeparator())
+            .setMultiLineFlow(true)
+            .setDefaultFlowStyle(FlowStyle.BLOCK)
+            .setExplicitStart(false)
             .build()
+    }
+
+    private val gson by lazy {
+        val gsonBuilder = GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
+        gsonBuilder.setPrettyPrinting()
+        gsonBuilder.create()
     }
 
     val isThemeLightMode = MutableStateFlow(Db.configs["isThemeLightMode"]?.toBooleanStrictOrNull() ?: true)
@@ -46,18 +57,8 @@ object Helpers {
 
     fun validateFALogString(rawText: String): Boolean {
         if (rawText.isBlank()) return false
-//        val firstIndexOfClose = rawText.indexOfFirst { it == ']' }
-//        if (firstIndexOfClose == -1) return false
-//        val logText = rawText.substring(firstIndexOfClose + 1).trim()
         if (!rawText.startsWith(faPrefix)) return false
         return true
-    }
-
-    fun cutLogString(rawText: String): String {
-        val firstIndexOfClose = rawText.indexOfFirst { it == ']' }
-        val trim = rawText.substring(firstIndexOfClose + 1).trim()
-//        println("trimmed : $trim")
-        return trim
     }
 
     /*
@@ -68,14 +69,17 @@ object Helpers {
         val cut1 = rawText.removePrefix(faPrefix)
         val eventParamsCutter = cut1.split(Regex(","), 2)
         val eventName = eventParamsCutter[0].trim()
-        val properties = hashMapEntityOf<String, Any>()
+        val properties = hashMapOf<String, Any>()
         eventParamsCutter.getOrNull(1)?.trim()?.let {
             val objectItem = Item.ObjectItem(it.trim())
             val something = objectMapper.parse(objectItem) as HashMap<out String, Any>
             properties.putAll(something)
         }
         val time = msg.header.timestamp.toEpochMilli()
-        return LogItem(source = SourceFA, eventName = eventName, properties = properties, localTime = time)
+        return LogItem(
+            source = SourceFA, eventName = eventName,
+            properties = hashMapEntityOf(properties), localTime = time
+        )
     }
 
     fun tryParseToType(str: String?): Any? {
@@ -182,7 +186,38 @@ object Helpers {
         }
     }
 
-    fun convertToYaml(properties: HashMap<String, Any>, printWriter: PrintWriter) {
+    fun convertToYamlString(properties: Map<String, Any>): String? {
+        return try {
+            val dump = Dump(settings)
+            dump.dumpToString(properties)
+        } catch (e: Exception) {
+            AppLog.d("YamlConverter", e.localizedMessage)
+            null
+        }
+    }
+
+    fun convertYamlToAnnotated(yaml: String): AnnotatedString {
+        return buildAnnotatedString {
+            withStyle(ParagraphStyle(lineHeight = 50.sp)) {
+                yaml.lineSequence().forEach { line ->
+                    val lineSplit = line.split(":", ignoreCase = false, limit = 2)
+                    if (lineSplit.size < 2) return@forEach
+                    lineSplit.firstOrNull()?.let { f ->
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(f)
+                        }
+                    }
+                    append(":")
+                    for (i in 1 until lineSplit.size) {
+                        append(lineSplit[i])
+                    }
+                    append(System.lineSeparator())
+                }
+            }
+        }
+    }
+
+    fun convertToYaml(properties: Map<String, Any>, printWriter: PrintWriter) {
         try {
             val dump = Dump(settings)
             dump.dump(properties, YamlWriter(printWriter))
@@ -191,7 +226,7 @@ object Helpers {
         }
     }
 
-    fun convertToYaml(properties: HashMap<String, Any>, streamDataWriter: StreamDataWriter) {
+    fun convertToYaml(properties: Map<String, Any>, streamDataWriter: StreamDataWriter) {
         try {
             val dump = Dump(settings)
             dump.dump(properties, streamDataWriter)
@@ -201,36 +236,8 @@ object Helpers {
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun createAnnotatedString(properties: HashMap<String, Any>, indent: Int = 0): AnnotatedString {
-        return buildAnnotatedString {
-            var counter = 0
-            val mapSize = properties.size
-            properties.forEach { (key, value) ->
-                append(buildString {
-                    if (indent == 0) return@buildString
-                    for (i in 0 until indent) {
-                        append(" ")
-                    }
-                })
-                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append(key)
-                }
-                append(" : ")
-                if (value is Map<*, *>) {
-                    val childIndent = indent + 4
-                    val childProperties = value as? HashMap<String, Any> ?: hashMapOf()
-                    val childString = createAnnotatedString(childProperties, childIndent)
-                    append("\n")
-                    append(childString)
-                } else {
-                    append(value.toString())
-                }
-                counter++
-                if (counter != mapSize) {
-                    append("\n\n")
-                }
-            }
-        }
+    fun createJsonString(properties: Map<String, Any>): String {
+        return gson.toJson(properties)
     }
 
     /**
@@ -339,4 +346,4 @@ object Helpers {
     }
 }
 
-fun <K, V> hashMapEntityOf(): HashMap<K, V> = HashMapEntity()
+fun <K, V> hashMapEntityOf(mapToWrap: MutableMap<K, V>): HashMapEntity<K, V> = HashMapEntity(mapToWrap)

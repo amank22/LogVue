@@ -116,10 +116,14 @@ class MainProcessor {
         val parser by lazy(LazyThreadSafetyMode.NONE) { sqlParser() }
         val fQuery = filterQuery?.trim()
         logItemStream.collect { list ->
+
             val filterResult = if (fQuery.isNullOrBlank() || fQuery == QUERY_PREFIX) {
                 registerPropertiesInParser(list, parser)
                 list
             } else {
+                if (!isNewStream) {
+                    indexedCollection.clear()
+                }
                 try {
                     filterLogs(indexedCollection, list, parser, fQuery)
                 } catch (e: Exception) {
