@@ -13,4 +13,3 @@ class EnglishStringRes : StringRes {
     override val filterFaqTitle: String = "Filter FAQ’s"
 
 }
-
