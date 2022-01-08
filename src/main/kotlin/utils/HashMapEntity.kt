@@ -18,7 +18,6 @@ import java.io.Serializable
  * limitations under the License.
  */
 
-
 /**
  * Wrapper for Map to allow efficient use in an IndexCollection.
  * MapEntities can be created via [QueryFactory.mapEntity]. Attributes can be created to read the entries
