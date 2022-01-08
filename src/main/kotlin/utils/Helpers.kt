@@ -2,7 +2,6 @@ package utils
 
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.sp
 import com.github.drapostolos.typeparser.GenericType
 import com.github.drapostolos.typeparser.TypeParser
@@ -13,6 +12,7 @@ import models.*
 import org.snakeyaml.engine.v2.api.Dump
 import org.snakeyaml.engine.v2.api.DumpSettings
 import org.snakeyaml.engine.v2.api.StreamDataWriter
+import org.snakeyaml.engine.v2.common.FlowStyle
 import org.snakeyaml.engine.v2.common.ScalarStyle
 import processor.YamlWriter
 import storage.Db
@@ -35,6 +35,10 @@ object Helpers {
 
     private val settings by lazy {
         DumpSettings.builder().setDefaultScalarStyle(ScalarStyle.PLAIN)
+            .setBestLineBreak(System.lineSeparator())
+            .setMultiLineFlow(true)
+            .setDefaultFlowStyle(FlowStyle.BLOCK)
+            .setExplicitStart(false)
             .build()
     }
 
@@ -182,7 +186,38 @@ object Helpers {
         }
     }
 
-    fun convertToYaml(properties: HashMap<String, Any>, printWriter: PrintWriter) {
+    fun convertToYamlString(properties: Map<String, Any>): String? {
+        return try {
+            val dump = Dump(settings)
+            dump.dumpToString(properties)
+        } catch (e: Exception) {
+            AppLog.d("YamlConverter", e.localizedMessage)
+            null
+        }
+    }
+
+    fun convertYamlToAnnotated(yaml: String): AnnotatedString {
+        return buildAnnotatedString {
+            withStyle(ParagraphStyle(lineHeight = 50.sp)) {
+                yaml.lineSequence().forEach { line ->
+                    val lineSplit = line.split(":", ignoreCase = false, limit = 2)
+                    if (lineSplit.size < 2) return@forEach
+                    lineSplit.firstOrNull()?.let { f ->
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(f)
+                        }
+                    }
+                    append(":")
+                    for (i in 1 until lineSplit.size) {
+                        append(lineSplit[i])
+                    }
+                    append(System.lineSeparator())
+                }
+            }
+        }
+    }
+
+    fun convertToYaml(properties: Map<String, Any>, printWriter: PrintWriter) {
         try {
             val dump = Dump(settings)
             dump.dump(properties, YamlWriter(printWriter))
@@ -197,70 +232,6 @@ object Helpers {
             dump.dump(properties, streamDataWriter)
         } catch (e: Exception) {
             AppLog.d("YamlConverter", e.localizedMessage)
-        }
-    }
-
-    fun propertiesAnnotatedString(properties: Map<String, Any>, indent: Int = 4): AnnotatedString {
-        return buildAnnotatedString {
-            val textIndent = TextIndent(indent.sp, indent.sp)
-            var paraIndex = pushStyle(ParagraphStyle(lineHeight = 18.sp, textIndent = textIndent))
-            var counter = 0
-            val mapSize = properties.size
-            properties.forEach { (key, value) ->
-                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append(key)
-                }
-                append(" : ")
-                if (value is Map<*, *>) {
-                    pop(paraIndex)
-                    val childIndent = indent + 4
-                    val childProperties = value as? HashMap<String, Any> ?: hashMapOf()
-                    val childString = propertiesAnnotatedString(childProperties, childIndent)
-//                    append("\n")
-                    append(childString)
-                    paraIndex = pushStyle(ParagraphStyle(lineHeight = 18.sp, textIndent = textIndent))
-                } else {
-                    append(value.toString())
-                }
-                counter++
-                if (counter != mapSize) {
-                    append(System.lineSeparator())
-                }
-            }
-            pop(paraIndex)
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun createAnnotatedString(properties: Map<String, Any>, indent: Int = 0): AnnotatedString {
-        return buildAnnotatedString {
-            var counter = 0
-            val mapSize = properties.size
-            properties.forEach { (key, value) ->
-                append(buildString { // temporary workaround for indentation cuz of no nested paragraph
-                    if (indent == 0) return@buildString
-                    (0 until indent).forEach { _ ->
-                        append(" ")
-                    }
-                })
-                withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
-                    append(key)
-                }
-                append(" : ")
-                if (value is Map<*, *>) {
-                    val childIndent = indent + 4
-                    val childProperties = value as? HashMap<String, Any> ?: hashMapOf()
-                    val childString = createAnnotatedString(childProperties, childIndent)
-                    append("\n")
-                    append(childString)
-                } else {
-                    append(value.toString())
-                }
-                counter++
-                if (counter != mapSize) {
-                    append("\n")
-                }
-            }
         }
     }
 

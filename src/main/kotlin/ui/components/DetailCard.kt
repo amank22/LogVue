@@ -23,11 +23,13 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import models.LogItem
 import ui.CustomTheme
+import utils.Helpers
 
 @Composable
 fun DetailCard(logItem: LogItem, modifier: Modifier = Modifier, onCloseClick: () -> Unit) {
-    val text = logItem.propertiesAString()
 //    val text = Helpers.createJsonString(logItem.properties)
+    val yaml = Helpers.convertToYamlString(logItem.properties.wrappedMap) ?: ""
+    val text = Helpers.convertYamlToAnnotated(yaml)
     Column(modifier) {
         var copyClicked by remember { mutableStateOf(false) }
         DetailHeader(logItem, Modifier.fillMaxWidth().padding(16.dp), onCloseClick) {
@@ -38,7 +40,7 @@ fun DetailCard(logItem: LogItem, modifier: Modifier = Modifier, onCloseClick: ()
         val scaffoldState = rememberScaffoldState()
         val scope = rememberCoroutineScope()
         if (copyClicked) {
-            val copyText = logItem.eventName + "\n\n" + text
+            val copyText = "eventName: " + logItem.eventName + "\n\n" + text
             LocalClipboardManager.current.setText(AnnotatedString(copyText))
             scope.launch {
                 scaffoldState.snackbarHostState.showSnackbar("Text Copied")
@@ -53,10 +55,13 @@ fun DetailCard(logItem: LogItem, modifier: Modifier = Modifier, onCloseClick: ()
                     .verticalScroll(scrollState)
                     .horizontalScroll(rememberScrollState())
             ) {
+                val isLightTheme = Helpers.isThemeLightMode.value
+                val color = if (isLightTheme) Color.Black else Color.White
                 Text(
                     text,
                     fontFamily = FontFamily.Monospace, softWrap = false,
-                    overflow = TextOverflow.Visible
+                    overflow = TextOverflow.Visible,
+                    color = color
                 )
             }
         }
