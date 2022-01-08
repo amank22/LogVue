@@ -1,11 +1,10 @@
 package ui.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.capitalize
@@ -16,7 +15,6 @@ import kotlinx.coroutines.launch
 import models.*
 import processor.Exporter
 import storage.Db
-import ui.CustomTheme
 import utils.Helpers
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
@@ -27,45 +25,45 @@ fun ExportDialog(
     logItems: List<LogItem>,
     onDismissRequest: () -> Unit
 ) {
-    StyledCustomVerticalDialog(onDismissRequest) {
-        Column(Modifier.fillMaxHeight().padding(16.dp)) {
-            var exportFilteredLogs by remember { mutableStateOf(true) }
-            var isFileSelectorOpen by remember { mutableStateOf(false) }
-            val scope = rememberCoroutineScope()
-            Text("Export Session", style = CustomTheme.typography.headings.h2)
-            Spacer(Modifier.height(24.dp))
-            SelectCheckBox(exportFilteredLogs, "Export filtered logs") {
-                exportFilteredLogs = !exportFilteredLogs
-            }
-            Spacer(Modifier.height(16.dp))
-            Text("Parameter formats:")
-            Spacer(Modifier.height(8.dp))
-            var selectedFormat by remember { mutableStateOf<ParameterFormats>(FormatJsonPretty) }
-            ParameterFormats(selectedFormat) {
-                selectedFormat = it
-            }
-            Spacer(Modifier.height(24.dp))
-            Button({
-                isFileSelectorOpen = true
-            }) {
-                Icon(painterResource("icons/ico-share.svg"), "Export session")
-                Text("Export")
-            }
-            if (isFileSelectorOpen) {
-                val fileName = sessionInfo.description.replace(" ", "_").capitalize(Locale.current)
-                val appended = if (selectedFormat == FormatYaml) {
-                    "_yaml"
-                } else "_json"
-                ExportFile("$fileName$appended.txt") { path ->
-                    isFileSelectorOpen = false
-                    scope.launch(Dispatchers.IO) {
-                        val logs = getListForExport(exportFilteredLogs, logItems)
-                        Exporter.exportList(sessionInfo, logs, path, selectedFormat)
-                        Db.configs["lastExportFolder"] = path.parent.absolutePathString()
-                        Helpers.openFileExplorer(path.parent)
-                        Helpers.openFileExplorer(path)
-                        onDismissRequest()
-                    }
+    SimpleVerticalDialog("Export Session", onDismissRequest, PaddingValues()) {
+        var exportFilteredLogs by remember { mutableStateOf(true) }
+        var isFileSelectorOpen by remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope()
+        SwitchItem(
+            exportFilteredLogs, "Export filtered logs", Modifier.fillMaxWidth()
+                .padding(16.dp),
+            "Only filtered logs or full session including all the logs",
+            painterResource("icons/ico_filter.svg")
+        ) {
+            exportFilteredLogs = it
+        }
+        Text("Parameter formats:", Modifier.padding(horizontal = 16.dp))
+        Spacer(Modifier.height(8.dp))
+        var selectedFormat by remember { mutableStateOf<ParameterFormats>(FormatJsonPretty) }
+        ParameterFormats(selectedFormat, modifier = Modifier.padding(horizontal = 6.dp)) {
+            selectedFormat = it
+        }
+        Spacer(Modifier.height(24.dp))
+        Button({
+            isFileSelectorOpen = true
+        }, Modifier.padding(horizontal = 16.dp)) {
+            Icon(painterResource("icons/ico-share.svg"), "Export session")
+            Text("Export")
+        }
+        if (isFileSelectorOpen) {
+            val fileName = sessionInfo.description.replace(" ", "_").capitalize(Locale.current)
+            val appended = if (selectedFormat == FormatYaml) {
+                "_yaml"
+            } else "_json"
+            ExportFile("$fileName$appended.txt") { path ->
+                isFileSelectorOpen = false
+                scope.launch(Dispatchers.IO) {
+                    val logs = getListForExport(exportFilteredLogs, logItems)
+                    Exporter.exportList(sessionInfo, logs, path, selectedFormat)
+                    Db.configs["lastExportFolder"] = path.parent.absolutePathString()
+                    Helpers.openFileExplorer(path.parent)
+                    Helpers.openFileExplorer(path)
+                    onDismissRequest()
                 }
             }
         }
@@ -98,44 +96,16 @@ private fun ParameterFormats(
     modifier: Modifier = Modifier,
     onSelected: (format: ParameterFormats) -> Unit
 ) {
-    Column(modifier) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         formats.forEach {
-            SelectRadioButton(selected == it, it.text) {
+            MultiLineRadioButton(
+                selected = selected == it, title = it.text,
+                modifier = Modifier.fillMaxWidth(),
+                subTitle = it.subText,
+                spacing = 0.dp
+            ) {
                 onSelected(it)
             }
         }
-    }
-}
-
-@Composable
-private fun SelectRadioButton(selected: Boolean, text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    Row(
-        modifier.clickable(MutableInteractionSource(), null, onClick = { onClick() }),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(selected, onClick)
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 4.dp)
-        )
-    }
-}
-
-@Composable
-private fun SelectCheckBox(
-    selected: Boolean,
-    text: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier.clickable(MutableInteractionSource(), null, onClick = { onClick() }),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Checkbox(selected, null)
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 4.dp)
-        )
     }
 }

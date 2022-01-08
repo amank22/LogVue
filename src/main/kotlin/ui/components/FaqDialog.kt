@@ -77,6 +77,12 @@ private fun buildFilterFaqs(): List<Faq> {
     )
     list.add(
         Faq(
+            "Can I use order the results?",
+            "Yes, you can use order by query to order data like this : `order by localTime desc` "
+        )
+    )
+    list.add(
+        Faq(
             "I am getting issue with query, what should I do?",
             "Make sure it’s a valid query. Also try wrapping keys & values with single quotes."
         )

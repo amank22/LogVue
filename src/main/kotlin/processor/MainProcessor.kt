@@ -16,6 +16,7 @@ import utils.Helpers
 import utils.failureOrNull
 import utils.getOrNull
 
+
 class MainProcessor {
 
     private val streamer = AndroidLogStreamer()
@@ -118,8 +119,8 @@ class MainProcessor {
         logItemStream.collect { list ->
 
             val filterResult = if (fQuery.isNullOrBlank() || fQuery == QUERY_PREFIX) {
-                registerPropertiesInParser(list, parser)
-                list
+                registerPropertiesInParser(list, parser, indexedCollection)
+                list.sortedBy { it.localTime }
             } else {
                 if (!isNewStream) {
                     indexedCollection.clear()

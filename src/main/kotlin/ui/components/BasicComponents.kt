@@ -1,11 +1,15 @@
 package ui.components
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Icon
+import androidx.compose.material.RadioButton
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.text.AnnotatedString
@@ -69,10 +73,7 @@ fun SwitchItem(
 
 @Composable
 fun SimpleListItem(
-    title: String?,
-    modifier: Modifier = Modifier,
-    subTitle: String? = null,
-    icon: Painter? = null
+    title: String?, modifier: Modifier = Modifier, subTitle: String? = null, icon: Painter? = null
 ) {
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         if (icon != null) {
@@ -108,8 +109,7 @@ fun SimpleListItem(
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             if (title != null) {
                 Text(
-                    title.text, style = CustomTheme.typography.headings.h6Medium,
-                    lineHeight = 19.sp
+                    title.text, style = CustomTheme.typography.headings.h6Medium, lineHeight = 19.sp
                 )
             }
             if (subTitle != null) {
@@ -142,8 +142,40 @@ fun ClickableListItem(
             }
             if (subTitle != null) {
                 ClickableText(
+                    subTitle, style = CustomTheme.typography.headings.semiText, onClick = onClick
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun MultiLineRadioButton(
+    selected: Boolean,
+    title: String?,
+    modifier: Modifier = Modifier,
+    subTitle: String? = null,
+    spacing: Dp = 8.dp,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier.clickable(MutableInteractionSource(), null, onClick = { onClick() }),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(spacing)
+    ) {
+        RadioButton(selected, onClick)
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            if (title != null) {
+                Text(
+                    title, style = CustomTheme.typography.headings.h6Medium, lineHeight = 19.sp
+                )
+            }
+            if (subTitle != null) {
+                Text(
                     subTitle,
-                    style = CustomTheme.typography.headings.semiText, onClick = onClick
+                    style = CustomTheme.typography.headings.caption,
+                    color = CustomTheme.colors.mediumContrast,
+                    lineHeight = 19.sp
                 )
             }
         }
