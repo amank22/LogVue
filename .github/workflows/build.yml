@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ arm64, ubuntu-latest, macos-latest, windows-latest ]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
         jdk: [ 18 ]
 
     steps:
@@ -75,7 +75,7 @@ jobs:
 
       - name: Gradle Build
         id: gradle-build
-        run: ./gradlew packageUberJarForCurrentOS package -DSENTRY_ENDPOINT=env.SENTRY_ENDPOINT -DSENTRY_DEBUG=env.SENTRY_DEBUG
+        run: ./gradlew packageUberJarForCurrentOS package -DSENTRY_ENDPOINT=${{ env.SENTRY_ENDPOINT }} -DSENTRY_DEBUG=${{ env.SENTRY_DEBUG }}
 
       - name: Uploading ${{ matrix.os }} uber jar
         if: steps.gradle-build.outcome == 'success'
