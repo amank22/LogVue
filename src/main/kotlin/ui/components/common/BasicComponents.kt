@@ -86,7 +86,10 @@ fun SwitchItem(
 
 @Composable
 fun SimpleListItem(
-    title: String?, modifier: Modifier = Modifier, subTitle: String? = null, icon: Painter? = null
+    title: String?,
+    modifier: Modifier = Modifier,
+    subTitle: String? = null,
+    icon: Painter? = null
 ) {
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         if (icon != null) {
@@ -197,7 +200,9 @@ fun MultiLineRadioButton(
 
 @Composable
 fun WebLinkButton(
-    socialIcons: SocialIcons, text: String, modifier: Modifier = Modifier
+    socialIcons: SocialIcons,
+    text: String,
+    modifier: Modifier = Modifier
 ) {
     val buttonColors = ButtonDefaults.textButtonColors(
         contentColor = CustomTheme.colors.mediumContrast
@@ -211,7 +216,9 @@ fun WebLinkButton(
 
 @Composable
 fun WebLinkButtonFilled(
-    socialIcons: SocialIcons, text: String, modifier: Modifier = Modifier
+    socialIcons: SocialIcons,
+    text: String,
+    modifier: Modifier = Modifier
 ) {
     val buttonColors = ButtonDefaults.buttonColors(
         backgroundColor = CustomTheme.colors.mediumContrast

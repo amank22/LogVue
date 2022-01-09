@@ -20,5 +20,5 @@ enum class SocialIcons(val icon: String, val url: String) {
     companion object {
         val DefaultIcons = listOf(Twitter, Github, Linkedin, Email)
     }
-    //object SocialFacebook : SocialIcons("icons/social/social_facebook.svg", "")
+    // object SocialFacebook : SocialIcons("icons/social/social_facebook.svg", "")
 }

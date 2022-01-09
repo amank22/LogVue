@@ -18,7 +18,6 @@ import utils.failureOrNull
 import utils.getOrNull
 import utils.reportException
 
-
 class MainProcessor {
 
     private val streamer = AndroidLogStreamer()

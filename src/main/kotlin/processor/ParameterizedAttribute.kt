@@ -14,7 +14,7 @@ class ParameterizedAttribute<T>(private val mapKey: String, private val clazz: C
             try {
                 return clazz.cast(result)
             } catch (cl: ClassCastException) {
-                //ignore
+                // ignore
             }
         }
         throw ClassCastException("Cannot cast " + result?.javaClass?.name + " to " + attributeType.name + " for map key: " + mapKey)
