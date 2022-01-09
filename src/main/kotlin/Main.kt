@@ -27,7 +27,6 @@ import ui.components.dialogs.IntroDialog
 import utils.*
 import java.awt.Desktop
 
-
 @Composable
 @Preview
 fun App() {

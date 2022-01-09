@@ -29,6 +29,5 @@ fun CrashDialog(onDismissRequest: () -> Unit) {
             WebLinkButtonFilled(SocialIcons.GithubIssues, "Github Issue", Modifier.weight(0.5f))
             WebLinkButtonFilled(SocialIcons.Email, "Mail Us", Modifier.weight(0.5f))
         }
-
     }
 }

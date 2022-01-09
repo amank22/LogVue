@@ -29,5 +29,4 @@ object SentryHelper {
     fun breadcrumb(breadcrumb: Breadcrumb) {
         Sentry.addBreadcrumb(breadcrumb)
     }
-
 }

@@ -62,7 +62,9 @@ fun filterLogs(
 }
 
 fun registerPropertiesInParser(
-    list: List<LogItem>, parser: SQLParser<LogItem>, indexedCollection: ConcurrentIndexedCollection<LogItem>
+    list: List<LogItem>,
+    parser: SQLParser<LogItem>,
+    indexedCollection: ConcurrentIndexedCollection<LogItem>
 ) {
     val propertySet = hashSetOf<String>()
     list.forEach {
@@ -96,7 +98,8 @@ private fun registerMapPropertiesInParser(
 }
 
 fun registerAndAddIndex(
-    value: Any, key: String,
+    value: Any,
+    key: String,
     parser: SQLParser<LogItem>,
     indexedCollection: ConcurrentIndexedCollection<LogItem>
 ) {
