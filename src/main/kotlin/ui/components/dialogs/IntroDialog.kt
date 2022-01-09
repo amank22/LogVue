@@ -1,4 +1,4 @@
-package ui.components
+package ui.components.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ui.CustomTheme
+import ui.components.common.AppLogo
 
 @Composable
 fun IntroDialog(onDismissRequest: () -> Unit) {

@@ -1,4 +1,4 @@
-package ui.components
+package ui.components.dialogs
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -91,7 +91,7 @@ fun CustomDialog(
     Floats.constrainToRange(backgroundAlpha, 0.0f, 1.0f)
     Floats.constrainToRange(dialogWidthRatio, 0.1f, 1.0f)
     Floats.constrainToRange(dialogHeightRatio, 0.1f, 1.0f)
-    with(UndecoratedWindowAlertDialogProvider) {
+    with(PopupAlertDialogProvider) {
         AlertDialog(onDismissRequest) {
             Dialog(
                 onCloseRequest = onDismissRequest,

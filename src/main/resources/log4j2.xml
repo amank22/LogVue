@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-    <appenders>
-        <console name="stdout" target="SYSTEM_OUT">
-            <patternLayout pattern="%d{ABSOLUTE} %5p %c{1}:%L - %m%n" />
-        </console>
-    </appenders>
-
-    <loggers>
-        <root level="verbose">
-            <appenderRef ref="stdout" />
-        </root>
-    </loggers>
-</configuration>
+<Configuration status="warn" packages="org.apache.logging.log4j.core,io.sentry.log4j2">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Sentry"/>
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>

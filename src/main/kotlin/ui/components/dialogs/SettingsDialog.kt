@@ -1,7 +1,9 @@
-package ui.components
+package ui.components.dialogs
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,12 +16,13 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import models.SocialIcons
 import ui.CustomTheme
+import ui.components.ItemHeader
+import ui.components.common.*
 import utils.AppSettings
 import utils.Helpers
 
 @Composable
 fun SettingsDialog(onDismissRequest: () -> Unit) {
-
     SimpleVerticalDialog(header = "Settings", onDismissRequest = onDismissRequest) {
         GeneralSettingBlock(Modifier.fillMaxWidth())
         Spacer(Modifier.height(16.dp))
@@ -103,21 +106,10 @@ fun OtherSettingBlock(modifier: Modifier = Modifier) {
             }
             Row(Modifier.padding(start = 32.dp)) {
                 SocialIcons.DefaultIcons.forEach {
-                    println(it)
                     SocialIcon(it)
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun WebLinkButton(socialIcons: SocialIcons, text: String) {
-    val buttonColors = ButtonDefaults.textButtonColors(contentColor = CustomTheme.colors.mediumContrast)
-    TextButton({ openBrowser(socialIcons.url) }, colors = buttonColors) {
-        Icon(painterResource(socialIcons.icon), socialIcons.name)
-        Spacer(Modifier.width(4.dp))
-        Text(text, style = CustomTheme.typography.bodySmall)
     }
 }
 

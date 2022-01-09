@@ -1,4 +1,4 @@
-package ui.components
+package ui.components.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import models.Faq
 import ui.CustomTheme
+import ui.components.common.SimpleListItem
 
 @Composable
 fun FaqDialog(

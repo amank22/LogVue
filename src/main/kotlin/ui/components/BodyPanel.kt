@@ -20,7 +20,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import inputs.adb.CancelException
 import inputs.adb.LogCatErrors
 import inputs.adb.ddmlib.Devices
 import inputs.adb.logcatErrorString
@@ -95,7 +94,7 @@ fun BodyPanel(
         if (isOpen) {
             val sessionInfo = processor.getSessionInfo(sessionId.orEmpty())
             if (sessionInfo != null) {
-                ExportDialog(sessionInfo, logItems) {
+                ui.components.dialogs.ExportDialog(sessionInfo, logItems) {
                     isOpen = false
                 }
             }
@@ -298,9 +297,5 @@ private fun fetchOldData(
 }
 
 private fun pauseProcessor(processor: MainProcessor) {
-    try {
-        processor.pause()
-    } catch (ex: CancelException) {
-        println(ex.message)
-    }
+    processor.pause()
 }

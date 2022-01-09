@@ -11,6 +11,7 @@ import com.googlecode.cqengine.index.radixreversed.ReversedRadixTreeIndex
 import com.googlecode.cqengine.query.parser.sql.SQLParser
 import models.LogItem
 import utils.AppLog
+import utils.reportException
 import kotlin.reflect.KProperty1
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
@@ -48,7 +49,6 @@ fun filterLogs(
 ): List<LogItem> {
     indexedCollection.addAll(list)
     registerPropertiesInParser(list, parser, indexedCollection)
-    println("Filtering logs")
     val filterResult = measureTimedValue {
         parser.retrieve(indexedCollection, filterQuery)
     }
@@ -119,7 +119,7 @@ fun registerAndAddIndex(
                     addIndex(ReversedRadixTreeIndex.onAttribute(att))
                     parser.registerAttribute(att)
                 } catch (e: Exception) {
-                    // TODO: Make sure to log these exceptions somewhere so that we can analyse them
+                    e.reportException()
                     addGenericAttribute(key, value, parser)
                 }
             }
@@ -127,9 +127,10 @@ fun registerAndAddIndex(
                 try {
                     val att: ParameterizedAttribute<Comparable<*>> = ParameterizedAttribute(key, value.javaClass)
                     addIndex(HashIndex.onAttribute(att))
-                    addIndex(NavigableIndex.onAttribute(att))
+//                    addIndex(NavigableIndex.onAttribute(att)) // TODO: break it to specific types
                     parser.registerAttribute(att)
                 } catch (e: Exception) {
+                    e.reportException()
                     addGenericAttribute(key, value, parser)
                 }
             }

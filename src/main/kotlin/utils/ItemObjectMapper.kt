@@ -22,8 +22,7 @@ class ItemObjectMapper {
                 }
             }
         } catch (e: Exception) {
-            LOGGER.error("Unexpected exception!", e)
-            println("Unexpected Exception! (item=$item e = ${e.message}")
+            Exception("Item mapping failed for item=$item", e).reportException()
             item.stringRepresentation
         }
     }
@@ -31,7 +30,6 @@ class ItemObjectMapper {
     private fun parseObject(item: ObjectItem): HashMap<String, Any?> {
         val map = hashMapOf<String, Any?>()
         item.getAttributes().forEach { entry ->
-//            println("parsing for field: $entry")
             val stringRepresentation = entry.value.stringRepresentation ?: ""
             val key = entry.key.removePrefix("{").removeSuffix("}")
 

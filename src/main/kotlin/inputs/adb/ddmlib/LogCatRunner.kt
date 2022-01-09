@@ -4,9 +4,9 @@ import com.android.ddmlib.*
 import com.android.ddmlib.logcat.LogCatMessageParser
 import models.LogCatHeader2
 import models.LogCatMessage2
+import utils.reportException
 import java.io.IOException
 import java.time.Instant
-import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.concurrent.GuardedBy
@@ -61,9 +61,11 @@ class LogCatRunner(
         } catch (e: TimeoutException) {
             notifyListeners(arrayListOf(sConnectionTimeoutMsg))
         } catch (ignored: AdbCommandRejectedException) {
+            ignored.reportException()
             // will not be thrown as long as the shell supports logcat
         } catch (ignored: ShellCommandUnresponsiveException) {
             // this will not be thrown since the last argument is 0
+            ignored.reportException()
         } catch (e: IOException) {
             notifyListeners(arrayListOf(sConnectionErrorMsg))
         }
