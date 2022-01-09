@@ -4,6 +4,8 @@ import com.googlecode.cqengine.attribute.SimpleNullableAttribute
 import com.googlecode.cqengine.query.option.QueryOptions
 import javassist.NotFoundException
 import models.LogItem
+import utils.WarningException
+import utils.reportException
 
 class ParameterizedAttribute<T>(private val mapKey: String, private val clazz: Class<T>) :
     SimpleNullableAttribute<LogItem, T>(LogItem::class.java, clazz, mapKey) {
@@ -41,12 +43,12 @@ class ParameterizedAttribute<T>(private val mapKey: String, private val clazz: C
                 return null // todo: not sure about this logic
             }
             if (value !is Map<*, *> && index != (nSize - 1)) {
-                val ex = IllegalArgumentException(
+                val ex = WarningException(
                     "Nested structure should be in a map/object. " +
                             "Nested key = $nestedKeys with current key = $it and value = $value.\n" +
                             "Log Item is $logItem"
                 )
-                ex.printStackTrace()
+                ex.reportException()
                 return null
             }
             if (index != (nSize - 1)) {

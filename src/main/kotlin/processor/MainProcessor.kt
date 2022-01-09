@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import models.ErrorContent
 import models.LogItem
 import models.SessionInfo
 import storage.Db
@@ -134,7 +135,7 @@ class MainProcessor {
                     e.reportException()
                     sentryTransaction.throwable = e
                     sentryTransaction.status = SpanStatus.INTERNAL_ERROR
-                    listOf(LogItem.errorContent("Error in query\n${e.message}"))
+                    listOf(LogItem.errorContent(ErrorContent("Unable to filter current query", e)))
                 } finally {
                     sentryTransaction.finish()
                 }

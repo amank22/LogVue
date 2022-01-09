@@ -150,6 +150,11 @@ private fun ConcurrentIndexedCollection<LogItem>.addGenericAttribute(
     parser: SQLParser<LogItem>
 ) {
     val att: ParameterizedAttribute<Any> = ParameterizedAttribute(key, value.javaClass)
-    addIndex(HashIndex.onAttribute(att))
+    try {
+        addIndex(HashIndex.onAttribute(att))
+    } catch (e: IllegalStateException) {
+        // Maybe the index is already added
+        AppLog.d(e.message.orEmpty())
+    }
     parser.registerAttribute(att)
 }
