@@ -17,6 +17,7 @@ data class LogItem(
     companion object {
         private const val serialVersionUID = 1L
         val EVENT_NAME = attribute("eventName", LogItem::eventName)
+        val ATTR_TIME = attribute("localTime", LogItem::localTime)
 
         fun noContent(msg: String) = LogItem(SourceInternalContent, "No Logs", internalContent = NoLogsContent(msg))
         fun errorContent(error: String) = LogItem(SourceInternalContent, "Error", internalContent = ErrorContent(error))

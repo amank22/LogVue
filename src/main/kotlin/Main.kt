@@ -21,12 +21,12 @@ import storage.Db
 import ui.AppTheme
 import ui.CustomTheme
 import ui.components.BodyPanel
-import ui.components.IntroDialog
 import ui.components.SideNavigation
-import utils.APP_NAME
-import utils.AppLog
-import utils.Helpers
+import ui.components.dialogs.CrashDialog
+import ui.components.dialogs.IntroDialog
+import utils.*
 import java.awt.Desktop
+
 
 @Composable
 @Preview
@@ -49,16 +49,28 @@ fun App() {
             AdbHelper.init()
         }
         LaunchIntroIfNeeded()
+        LaunchCrashDialogIfNeeded()
     }
 }
 
 @Composable
 fun LaunchIntroIfNeeded() {
-    var introLaunched by remember { mutableStateOf(Db.configs["isIntroLaunched"].toBoolean()) }
+    var introLaunched by remember { mutableStateOf(AppSettings.getFlag("isIntroLaunched")) }
     if (!introLaunched) {
         IntroDialog {
-            Db.configs["isIntroLaunched"] = "true"
+            AppSettings.setFlag("isIntroLaunched", true)
             introLaunched = true
+        }
+    }
+}
+
+@Composable
+fun LaunchCrashDialogIfNeeded() {
+    if (!CustomExceptionHandler.isLastTimeCrashed()) return
+    var launched by remember { mutableStateOf(true) }
+    if (launched) {
+        CrashDialog {
+            launched = false
         }
     }
 }
@@ -78,11 +90,10 @@ fun main() = application(false) {
         onClose("User Close")
         exitApplication()
     }
+    Thread.setDefaultUncaughtExceptionHandler(CustomExceptionHandler())
+    SentryHelper.init()
     val windowState = rememberWindowState(WindowPlacement.Floating, size = DpSize(1440.dp, 1024.dp))
-    Window(onCloseRequest = onCloseRequest, title = APP_NAME, state = windowState) {
-//        window.exceptionHandler = WindowExceptionHandler {
-//            println(it)
-//        }
+    Window(onCloseRequest = onCloseRequest, title = CustomTheme.strings.appName, state = windowState) {
         App()
     }
 }

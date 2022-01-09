@@ -11,9 +11,13 @@ class ParameterizedAttribute<T>(private val mapKey: String, private val clazz: C
     override fun getValue(logItem: LogItem, queryOptions: QueryOptions?): T? {
         val result = getNestedValue(logItem)
         if (result == null || attributeType.isAssignableFrom(clazz)) {
-            return clazz.cast(result)
+            try {
+                return clazz.cast(result)
+            } catch (cl: ClassCastException) {
+                //ignore
+            }
         }
-        throw ClassCastException("Cannot cast " + result.javaClass.name + " to " + attributeType.name + " for map key: " + mapKey)
+        throw ClassCastException("Cannot cast " + result?.javaClass?.name + " to " + attributeType.name + " for map key: " + mapKey)
     }
 
     private fun getNestedValue(logItem: LogItem): Any? {

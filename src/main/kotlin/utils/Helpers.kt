@@ -191,7 +191,7 @@ object Helpers {
             val dump = Dump(settings)
             dump.dumpToString(properties)
         } catch (e: Exception) {
-            AppLog.d("YamlConverter", e.localizedMessage)
+            e.reportException()
             null
         }
     }
@@ -222,7 +222,7 @@ object Helpers {
             val dump = Dump(settings)
             dump.dump(properties, YamlWriter(printWriter))
         } catch (e: Exception) {
-            AppLog.d("YamlConverter", e.localizedMessage)
+            e.reportException()
         }
     }
 
@@ -231,7 +231,7 @@ object Helpers {
             val dump = Dump(settings)
             dump.dump(properties, streamDataWriter)
         } catch (e: Exception) {
-            AppLog.d("YamlConverter", e.localizedMessage)
+            e.reportException()
         }
     }
 
@@ -292,7 +292,7 @@ object Helpers {
             }
             Runtime.getRuntime().exec(command)
         } catch (e: Exception) {
-            AppLog.d("failed to open file manager")
+            e.reportException()
         }
     }
 

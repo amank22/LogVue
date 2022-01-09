@@ -101,9 +101,6 @@ object Db {
             newCatalog.remove(it)
         }
         db.nameCatalogSave(newCatalog)
-        db.getAllNames().forEach {
-            println(it)
-        }
         db.commit()
     }
 

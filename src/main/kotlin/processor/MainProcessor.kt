@@ -4,6 +4,8 @@ import com.android.ddmlib.Log
 import inputs.adb.AndroidLogStreamer
 import inputs.adb.LogCatErrors
 import inputs.adb.LogErrorNoSession
+import io.sentry.Sentry
+import io.sentry.SpanStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -11,10 +13,11 @@ import kotlinx.coroutines.withContext
 import models.LogItem
 import models.SessionInfo
 import storage.Db
-import utils.AppLog
 import utils.Helpers
 import utils.failureOrNull
 import utils.getOrNull
+import utils.reportException
+
 
 class MainProcessor {
 
@@ -118,17 +121,23 @@ class MainProcessor {
         logItemStream.collect { list ->
 
             val filterResult = if (fQuery.isNullOrBlank() || fQuery == QUERY_PREFIX) {
-                registerPropertiesInParser(list, parser)
-                list
+                registerPropertiesInParser(list, parser, indexedCollection)
+                list.sortedBy { it.localTime }
             } else {
                 if (!isNewStream) {
                     indexedCollection.clear()
                 }
+                val sentryTransaction = Sentry.startTransaction("filterLogs", "filter", true)
+                sentryTransaction.setData("query", filterQuery ?: "")
                 try {
                     filterLogs(indexedCollection, list, parser, fQuery)
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    e.reportException()
+                    sentryTransaction.throwable = e
+                    sentryTransaction.status = SpanStatus.INTERNAL_ERROR
                     listOf(LogItem.errorContent("Error in query\n${e.message}"))
+                } finally {
+                    sentryTransaction.finish()
                 }
             }
             if (filterResult.isEmpty() && !isNewStream) {
@@ -140,10 +149,6 @@ class MainProcessor {
     }
 
     fun pause() {
-        try {
-            streamer.stop()
-        } catch (e: Exception) {
-            AppLog.d("unnecessary", "keeping exception for now in pause")
-        }
+        streamer.stop()
     }
 }

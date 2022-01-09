@@ -17,6 +17,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import processor.QUERY_PREFIX
 import ui.CustomTheme
+import ui.components.dialogs.FilterFaqDialog
+import ui.components.dialogs.SettingsDialog
 
 @Composable
 fun BodyHeader(

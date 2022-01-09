@@ -21,6 +21,7 @@ import inputs.adb.ddmlib.Devices
 import models.DeviceDetails2
 import models.SessionInfo
 import ui.CustomTheme
+import ui.components.dialogs.StyledCustomVerticalDialog
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable

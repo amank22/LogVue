@@ -1,4 +1,4 @@
-package ui.components
+package ui.components.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +13,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import models.Faq
 import ui.CustomTheme
+import ui.components.common.SimpleListItem
 
 @Composable
 fun FaqDialog(
@@ -73,6 +74,12 @@ private fun buildFilterFaqs(): List<Faq> {
             "Can I use nested objects in query?",
             "Yes, you can use dot operator for nested objects. Just make sure to single quote the nested key." +
                     "\n\nEx: ‘analytics.request_id’ = ‘123456’"
+        )
+    )
+    list.add(
+        Faq(
+            "Can I use order the results?",
+            "Yes, you can use order by query to order data like this : `order by localTime desc` "
         )
     )
     list.add(

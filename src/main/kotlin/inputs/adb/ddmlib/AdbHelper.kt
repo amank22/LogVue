@@ -17,6 +17,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import models.LogCatMessage2
 import utils.Either
+import utils.reportException
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -50,7 +51,7 @@ object AdbHelper {
         try {
             AndroidDebugBridge.terminate()
         } catch (e: Exception) {
-            // ignore
+            e.reportException()
         }
     }
 
@@ -81,7 +82,6 @@ object AdbHelper {
             clientPid = client.clientData.pid
         }
         if (clientPid < 0) {
-            println("Client is null")
             send(Either.Left(LogErrorPackageIssue))
             close()
             awaitClose()
@@ -127,6 +127,7 @@ object AdbHelper {
         val androidEnvHome: File? = try {
             System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
         } catch (e: SecurityException) {
+            e.reportException()
             null
         }?.let { File(it) }
 

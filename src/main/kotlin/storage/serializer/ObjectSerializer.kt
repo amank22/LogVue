@@ -6,7 +6,8 @@ import org.mapdb.DataOutput2
 import org.mapdb.serializer.GroupSerializerObjectArray
 import java.io.*
 
-class ObjectSerializer<T>(val classLoader: ClassLoader = Thread.currentThread().contextClassLoader) : GroupSerializerObjectArray<T>() {
+class ObjectSerializer<T>(val classLoader: ClassLoader = Thread.currentThread().contextClassLoader) :
+    GroupSerializerObjectArray<T>() {
 
     override fun serialize(out: DataOutput2, value: T) {
         val out2 = ObjectOutputStream(out as OutputStream)

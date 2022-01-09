@@ -1,4 +1,4 @@
-package ui.components
+package ui.components.dialogs
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.AwtWindow
