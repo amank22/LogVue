@@ -87,10 +87,10 @@ compose.desktop {
     }
 }
 
-//tasks.withType<Jar>().configureEach {
+// tasks.withType<Jar>().configureEach {
 //    println("excluding meta")
 //    exclude("META-INF/*.RSA", "META-INF/*.SF","META-INF/*.DSA")
-//}
+// }
 
 buildConfig {
     className("AppBuildConfig")
