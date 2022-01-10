@@ -17,9 +17,12 @@ import java.awt.Desktop
 
 @Composable
 fun ApplicationScope.appWindow() {
-    Desktop.getDesktop().setQuitHandler { e, response ->
-        closeApp(e.source.toString())
-        response.performQuit()
+    val desktop = Desktop.getDesktop()
+    if (desktop.isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
+        desktop.setQuitHandler { e, response ->
+            closeApp(e.source.toString())
+            response.performQuit()
+        }
     }
     val onCloseRequest = {
         closeApp("User Close")
