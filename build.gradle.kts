@@ -8,6 +8,8 @@ plugins {
     id("com.github.gmazzo.buildconfig") version "3.0.3"
 }
 
+val r8: Configuration by configurations.creating
+
 group = "com.voxfinite"
 version = "1.0.0"
 
@@ -37,24 +39,29 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
 
     implementation("io.sentry:sentry-log4j2:5.5.2")
+
+    r8("com.android.tools:r8:3.0.73")
 }
 
 tasks.test {
     useJUnit()
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+tasks.withType<KotlinCompile>().configureEach {
+    kotlinOptions.jvmTarget = "16"
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 }
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "app.MainKt"
         nativeDistributions {
+            modules(
+                "java.compiler", "java.instrument", "java.management",
+                "java.naming", "java.rmi", "java.scripting", "java.sql", "jdk.attach",
+                "jdk.jdi", "jdk.unsupported", "jdk.crypto.ec"
+            )
+//            includeAllModules = true
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = project.name
             packageVersion = "${project.version}"
@@ -65,7 +72,12 @@ compose.desktop {
             }
             macOS {
                 bundleID = "${project.group}.${project.name}"
+                setDockNameSameAsPackageName = true
                 iconFile.set(project.file("logo_icon.icns"))
+//                notarization {
+//                    appleID.set("test.app@example.com")
+//                    password.set("@keychain:NOTARIZATION_PASSWORD")
+//                }
             }
             windows {
                 upgradeUuid = "8AEBC8BF-9C94-4D02-ACA8-AF543E0CEB98"
@@ -75,11 +87,63 @@ compose.desktop {
     }
 }
 
+//tasks.withType<Jar>().configureEach {
+//    println("excluding meta")
+//    exclude("META-INF/*.RSA", "META-INF/*.SF","META-INF/*.DSA")
+//}
+
 buildConfig {
     className("AppBuildConfig")
     useKotlinOutput { topLevelConstants = true }
     buildConfigField("String", "APP_NAME", "\"${project.name}\"")
     buildConfigField("String", "APP_VERSION", "\"${project.version}\"")
+    val sentryEndpoint = if (project.hasProperty("SENTRY_ENDPOINT")) {
+        project.property("SENTRY_ENDPOINT").toString()
+    } else {
+        ""
+    }
+    buildConfigField("String", "SENTRY_ENDPOINT", "\"${sentryEndpoint}\"")
+}
+
+// Define task to obfuscate the JAR and output to <name>.min.jar
+tasks.register<JavaExec>("r8") {
+    val packageUberJarForCurrentOS = tasks.getByName("packageUberJarForCurrentOS")
+    dependsOn(packageUberJarForCurrentOS)
+    val file = packageUberJarForCurrentOS.outputs.files.first()
+    val rules = file("src/main/shrink-rules.pro")
+    val output = File(file.parentFile, "${file.nameWithoutExtension}.min.jar")
+    inputs.files(file, rules)
+    outputs.file(output)
+    classpath(r8)
+    mainClass.set("com.android.tools.r8.R8")
+    args = listOf(
+        "--release",
+        "--classfile",
+        "--output", output.toString(),
+        "--pg-conf", rules.toString(),
+        "--lib", System.getProperty("java.home")
+    )
+    doFirst {
+        args?.add(file.absolutePath)
+    }
+}
+
+tasks.register<Zip>("repackageUberJar") {
+    val packageUberJarForCurrentOS = tasks.getByName("packageUberJarForCurrentOS")
+    dependsOn(packageUberJarForCurrentOS)
+    val file = packageUberJarForCurrentOS.outputs.files.first()
+    val output = File(file.parentFile, "${file.nameWithoutExtension}-repacked.jar")
+    archiveFileName.set(output.absolutePath)
+    destinationDirectory.set(file.parentFile.absoluteFile)
+    exclude("META-INF/*.SF")
+    exclude("META-INF/*.RSA")
+    exclude("META-INF/*.DSA")
+    from(project.zipTree(file))
+    doLast {
+        delete(file)
+        output.renameTo(file)
+        logger.lifecycle("The repackaged jar is written to ${archiveFile.get().asFile.canonicalPath}")
+    }
 }
 
 /**

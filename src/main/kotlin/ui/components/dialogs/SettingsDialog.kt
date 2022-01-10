@@ -1,6 +1,7 @@
 package ui.components.dialogs
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -20,15 +21,22 @@ import ui.components.ItemHeader
 import ui.components.common.*
 import utils.AppSettings
 import utils.Helpers
+import utils.SentryHelper
 
 @Composable
 fun SettingsDialog(onDismissRequest: () -> Unit) {
     SimpleVerticalDialog(header = "Settings", onDismissRequest = onDismissRequest) {
-        GeneralSettingBlock(Modifier.fillMaxWidth())
-        Spacer(Modifier.height(16.dp))
-        Divider(color = CustomTheme.colors.componentOutline, thickness = (0.5).dp)
-        Spacer(Modifier.height(16.dp))
-        OtherSettingBlock(Modifier.fillMaxWidth())
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            item {
+                GeneralSettingBlock(Modifier.fillMaxWidth())
+            }
+            item {
+                Divider(color = CustomTheme.colors.componentOutline, thickness = (0.5).dp)
+            }
+            item {
+                OtherSettingBlock(Modifier.fillMaxWidth())
+            }
+        }
     }
 }
 
@@ -53,12 +61,24 @@ fun GeneralSettingBlock(modifier: Modifier = Modifier) {
             isAutoScroll = it
             AppSettings.setFlag(AppSettings.AUTO_SCROLL, it)
         }
+        if (SentryHelper.isEnabled()) {
+            var reportCrash by remember { mutableStateOf(AppSettings.getFlag("reportCrash")) }
+            SwitchItem(
+                reportCrash, "Report Crashes", Modifier.fillMaxWidth(),
+                "Should we report crashes? We use it to make sure our app stays healthy. " +
+                        "No private information is shared with us.",
+                painterResource("icons/bug.svg")
+            ) {
+                reportCrash = it
+                AppSettings.setFlag("reportCrash", it)
+            }
+        }
     }
 }
 
 @Composable
 fun OtherSettingBlock(modifier: Modifier = Modifier) {
-    Column(modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         ItemHeader("Other")
         Column {
             SimpleListItem(
