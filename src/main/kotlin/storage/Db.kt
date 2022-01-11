@@ -17,9 +17,9 @@ object Db {
         val slash = File.separator
         val dbName = "sessions.db"
         val dbFile = File("$homeDir${slash}logvue${slash}$dbName")
-        if (!(dbFile.canRead() && dbFile.canWrite())) {
-            throw SecurityException("Can not read at path ${dbFile.canonicalPath}")
-        }
+//        if (!(dbFile.canRead() && dbFile.canWrite())) {
+//            throw SecurityException("Can not read at path ${dbFile.canonicalPath}")
+//        } // TODO: try to move to inMemory db if this fails and show an error
         DBMaker.fileDB(dbFile).fileMmapEnableIfSupported().checksumHeaderBypass().make()
     }
 
