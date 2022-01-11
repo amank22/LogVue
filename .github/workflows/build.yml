@@ -13,9 +13,9 @@ on:
       - 'docs/**'
       - '.github/config/labels.yml'
 
-    pull_request:
-      branches:
-        - main
+  pull_request:
+    branches:
+      - main
 
   workflow_dispatch:
   repository_dispatch:
