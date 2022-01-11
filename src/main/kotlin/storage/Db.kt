@@ -14,7 +14,7 @@ object Db {
 
     private val diskDb by lazy {
         val homeDir = System.getProperty("user.home")
-        val slash = File.pathSeparator
+        val slash = File.separator
         val dbName = "sessions.db"
         val dbFile = File("$homeDir${slash}logvue${slash}$dbName")
         if (!(dbFile.canRead() && dbFile.canWrite())) {
