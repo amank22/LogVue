@@ -276,16 +276,10 @@ object Helpers {
         return takeValue
     }
 
-    fun isWindows(): Boolean {
-        val os = System.getProperty("os.name").lowercase(Locale.getDefault())
-        // windows
-        return os.indexOf("win") >= 0
-    }
-
     fun openFileExplorer(path: Path) {
         try {
             val pathString = path.absolutePathString()
-            val command = if (isWindows()) {
+            val command = if (SystemTools.getOS() == OsWindows) {
                 "Explorer.exe $pathString"
             } else {
                 "open $pathString"
