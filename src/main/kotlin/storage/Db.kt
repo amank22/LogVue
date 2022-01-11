@@ -6,20 +6,13 @@ import org.mapdb.DBMaker
 import org.mapdb.HTreeMap
 import org.mapdb.Serializer
 import storage.serializer.ObjectSerializer
-import java.io.File
 
 object Db {
 
     private const val PREFIX = "Session-"
 
     private val diskDb by lazy {
-        val homeDir = System.getProperty("user.home")
-        val slash = File.separator
-        val dbName = "sessions.db"
-        val dbFile = File("$homeDir${slash}logvue${slash}$dbName")
-//        if (!(dbFile.canRead() && dbFile.canWrite())) {
-//            throw SecurityException("Can not read at path ${dbFile.canonicalPath}")
-//        } // TODO: try to move to inMemory db if this fails and show an error
+        val dbFile = StorageHelper.getDbFile()
         DBMaker.fileDB(dbFile).fileMmapEnableIfSupported().checksumHeaderBypass().make()
     }
 
