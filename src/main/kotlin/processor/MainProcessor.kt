@@ -130,7 +130,9 @@ class MainProcessor {
                 val sentryTransaction = Sentry.startTransaction("filterLogs", "filter", true)
                 sentryTransaction.setData("query", filterQuery ?: "")
                 try {
-                    filterLogs(indexedCollection, list, parser, fQuery)
+                    val fl = filterLogs(indexedCollection, list, parser, fQuery)
+                    sentryTransaction.status = SpanStatus.OK
+                    fl
                 } catch (e: Exception) {
                     e.reportException()
                     sentryTransaction.throwable = e
