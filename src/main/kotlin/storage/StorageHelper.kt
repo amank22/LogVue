@@ -9,8 +9,10 @@ import utils.DbCreationException
 import utils.reportException
 import java.io.File
 import java.io.IOException
+import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermissions
+
 
 object StorageHelper {
 
@@ -39,11 +41,15 @@ object StorageHelper {
                 folder.delete()
             }
             try {
-                Files.createDirectory(
-                    folder.toPath(), PosixFilePermissions.asFileAttribute(
+                val isPosix = FileSystems.getDefault().supportedFileAttributeViews().contains("posix")
+                if (isPosix) {
+                    val posixAttribute = PosixFilePermissions.asFileAttribute(
                         PosixFilePermissions.fromString("rwxr-x---")
                     )
-                )
+                    Files.createDirectory(folder.toPath(), posixAttribute)
+                } else {
+                    Files.createDirectory(folder.toPath())
+                }
             } catch (e: IOException) {
                 throw IOException("Cannot create app folder at path ${folder.canonicalPath}", e)
             }
