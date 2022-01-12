@@ -13,7 +13,6 @@ object SystemTools {
             else -> throw UnsupportedOperationException("Operating system $os is not supported")
         }
     }
-
 }
 
 sealed interface OS
