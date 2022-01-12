@@ -46,9 +46,9 @@ object StorageHelper {
                     val posixAttribute = PosixFilePermissions.asFileAttribute(
                         PosixFilePermissions.fromString("rwxr-x---")
                     )
-                    Files.createDirectory(folder.toPath(), posixAttribute)
+                    Files.createDirectories(folder.toPath(), posixAttribute)
                 } else {
-                    Files.createDirectory(folder.toPath())
+                    Files.createDirectories(folder.toPath())
                 }
             } catch (e: IOException) {
                 throw IOException("Cannot create app folder at path ${folder.canonicalPath}", e)

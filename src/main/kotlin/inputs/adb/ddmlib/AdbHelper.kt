@@ -29,15 +29,17 @@ object AdbHelper {
     private const val PACKAGES_COMMAND = "pm list packages -3 -e"
     // list of lines with format : package:com.ea.games.r3_row
 
+    private const val ADB_TIMEOUT = 10L
+
     fun init() {
         val options = AdbInitOptions.builder().setClientSupportEnabled(true).build()
         AndroidDebugBridge.init(options)
         AndroidDebugBridge.addDeviceChangeListener(Devices())
         val adbPath = adbPath()
         bridge = if (!adbPath.isNullOrBlank()) {
-            AndroidDebugBridge.createBridge(adbPath, false, 10, TimeUnit.SECONDS)
+            AndroidDebugBridge.createBridge(adbPath, false, ADB_TIMEOUT, TimeUnit.SECONDS)
         } else {
-            AndroidDebugBridge.createBridge(10, TimeUnit.SECONDS)
+            AndroidDebugBridge.createBridge(ADB_TIMEOUT, TimeUnit.SECONDS)
         }
         AndroidDebugBridge.addDebugBridgeChangeListener {
             bridge = it
@@ -112,18 +114,18 @@ object AdbHelper {
     suspend fun getPackages(device: IDevice, onValue: (packages: List<String>) -> Unit) = withContext(Dispatchers.IO) {
         device.executeShellCommand(
             PACKAGES_COMMAND, PackagesReceiver(onValue),
-            10, TimeUnit.SECONDS
+            ADB_TIMEOUT, TimeUnit.SECONDS
         )
     }
 
     private fun IDevice.emptyShellCommand(command: String) {
         executeShellCommand(
             command,
-            EmptyReceiver, 10, TimeUnit.SECONDS
+            EmptyReceiver, ADB_TIMEOUT, TimeUnit.SECONDS
         )
     }
 
-    private fun adbPath(): String? {
+    fun adbPath(): String? {
         val androidEnvHome: File? = try {
             System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT")
         } catch (e: SecurityException) {
