@@ -39,6 +39,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
 
     implementation("io.sentry:sentry-log4j2:5.5.2")
+    // https://mvnrepository.com/artifact/net.harawata/appdirs
+    implementation("net.harawata:appdirs:1.2.1")
 
     r8("com.android.tools:r8:3.0.73")
 }
