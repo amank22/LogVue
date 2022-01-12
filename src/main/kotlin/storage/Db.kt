@@ -2,7 +2,6 @@ package storage
 
 import models.LogItem
 import models.SessionInfo
-import org.mapdb.DBMaker
 import org.mapdb.HTreeMap
 import org.mapdb.Serializer
 import storage.serializer.ObjectSerializer
@@ -12,8 +11,7 @@ object Db {
     private const val PREFIX = "Session-"
 
     private val diskDb by lazy {
-        val dbFile = StorageHelper.getDbFile()
-        DBMaker.fileDB(dbFile).fileMmapEnableIfSupported().checksumHeaderBypass().make()
+        StorageHelper.createDiskDb()
     }
 
     private var session: HTreeMap<String, LogItem>? = null

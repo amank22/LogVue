@@ -5,6 +5,7 @@ class CustomExceptionHandler : Thread.UncaughtExceptionHandler {
     override fun uncaughtException(t: Thread?, e: Throwable?) {
         e?.printStackTrace()
         setCrashed()
+        throw e ?: Exception("Unknown exception")
     }
 
     companion object {

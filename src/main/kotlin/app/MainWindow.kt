@@ -11,6 +11,7 @@ import inputs.adb.ddmlib.AdbHelper
 import storage.Db
 import ui.CustomTheme
 import utils.AppLog
+import utils.CustomExceptionHandler
 import utils.SentryHelper
 import java.awt.Desktop
 
@@ -27,7 +28,7 @@ fun ApplicationScope.appWindow() {
         closeApp("User Close")
         exitApplication()
     }
-//    Thread.setDefaultUncaughtExceptionHandler(CustomExceptionHandler())
+    Thread.setDefaultUncaughtExceptionHandler(CustomExceptionHandler())
     SentryHelper.init()
     val windowState = rememberWindowState(WindowPlacement.Floating, size = DpSize(1440.dp, 1024.dp))
     Window(onCloseRequest = onCloseRequest, title = CustomTheme.strings.appName, state = windowState) {
