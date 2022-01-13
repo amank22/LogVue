@@ -1,9 +1,9 @@
 ---
-name: 🚀 Feature
-about: Suggest a new feature
-title: '[FEATURE] <title>'
-labels: feature assignees: ''
-
+name: Feature Request
+about: Use this template for requesting new features
+title: "[FEATURE NAME]"
+labels: enhancement
+assignees:
 ---
 
 ## Detailed Description
