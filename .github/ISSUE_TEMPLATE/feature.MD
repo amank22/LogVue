@@ -1,10 +1,10 @@
 ---
-name: 🚀 Feature about: Suggest a new feature title: '[FEATURE] <title>'
-labels: feature assignees: ''
-
+name: Feature Request
+about: Use this template for requesting new features
+title: "[FEATURE NAME]"
+labels: enhancement
+assignees:
 ---
-
-# 🚀 Feature
 
 ## Detailed Description
 
@@ -28,7 +28,3 @@ labels: feature assignees: ''
   * [ ] Windows
   * [ ] Mac OS
   * [ ] Linux
-
-[//]: # (## Possible Solution)
-<!--- Not obligatory, but suggest a fix/reason for the bug, -->
-<!--- or ideas how to implement the addition or change -->
