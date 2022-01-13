@@ -2,8 +2,8 @@
 name: 🐞 Bug
 about: File a bug/issue
 title: '[BUG] <title>'
-labels: Bug, Needs Triage assignees: ''
-
+labels: Bug, Needs Triage 
+assignees: ''
 ---
 
 ## Expected Behavior

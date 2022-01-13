@@ -2,8 +2,8 @@
 name: 🧰 Change / Improvement
 about: Suggest improvement in existing feature
 title: '[IMPROVEMENT] <title>'
-labels: enhancement assignees: ''
-
+labels: enhancement 
+assignees: ''
 ---
 
 ## Expected Behavior
