@@ -6,8 +6,6 @@ labels: Bug, Needs Triage assignees: ''
 
 ---
 
-# 🐞 Bug
-
 ## Expected Behavior
 
 <!--- If you're describing a bug, tell us what should happen -->

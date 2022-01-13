@@ -6,8 +6,6 @@ labels: enhancement assignees: ''
 
 ---
 
-# 🧰 Change / Improvement
-
 ## Expected Behavior
 
 <!--- Tell us how it should work -->
