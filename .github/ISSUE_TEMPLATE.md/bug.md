@@ -1,8 +1,12 @@
 ---
-name: 🐞 Bug about: File a bug/issue title: '[BUG] <title>'
+name: 🐞 Bug
+about: File a bug/issue
+title: '[BUG] <title>'
 labels: Bug, Needs Triage assignees: ''
 
 ---
+
+# 🐞 Bug
 
 ## Expected Behavior
 
@@ -11,7 +15,7 @@ labels: Bug, Needs Triage assignees: ''
 ## Current Behavior
 
 <!--- If describing a bug, tell us what happens instead of the expected behavior -->
-<!--- If suggesting a change/improvement, explain the difference from current behavior -->
+<!--- If suggesting a change/improvement.md, explain the difference from current behavior -->
 
 ## Steps to Reproduce (for bugs)
 
@@ -34,9 +38,9 @@ labels: Bug, Needs Triage assignees: ''
 
 * Version used:
 * Operating System and version:
-  * [ ] Windows
-  * [ ] Mac OS
-  * [ ] Linux
+    * [ ] Windows
+    * [ ] Mac OS
+    * [ ] Linux
 
 [//]: # (## Possible Solution)
 <!--- Not obligatory, but suggest a fix/reason for the bug, -->

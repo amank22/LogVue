@@ -1,10 +1,12 @@
 ---
-name: Feature Request
-about: Use this template for requesting new features
-title: "[FEATURE NAME]"
-labels: enhancement
-assignees:
+name: 🚀 Feature
+about: Suggest a new feature
+title: '[FEATURE] <title>'
+labels: feature assignees: ''
+
 ---
+
+# 🚀 Feature
 
 ## Detailed Description
 
@@ -25,6 +27,6 @@ assignees:
 
 * Version used:
 * Operating System and version:
-  * [ ] Windows
-  * [ ] Mac OS
-  * [ ] Linux
+    * [ ] Windows
+    * [ ] Mac OS
+    * [ ] Linux

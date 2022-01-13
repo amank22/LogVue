@@ -1,5 +1,7 @@
 ---
-name: 🧰 Change / Improvement about: Suggest improvement in existing feature title: '[IMPROVEMENT] <title>'
+name: 🧰 Change / Improvement
+about: Suggest improvement in existing feature
+title: '[IMPROVEMENT] <title>'
 labels: enhancement assignees: ''
 
 ---
@@ -25,9 +27,9 @@ labels: enhancement assignees: ''
 
 * Version used:
 * Operating System and version:
-  * [ ] Windows
-  * [ ] Mac OS
-  * [ ] Linux
+    * [ ] Windows
+    * [ ] Mac OS
+    * [ ] Linux
 
 [//]: # (## Possible Solution)
 <!--- Not obligatory, but suggest a fix/reason for the bug, -->
