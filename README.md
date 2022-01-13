@@ -83,10 +83,7 @@ before you start making any changes.
 ## Future goals
 
 - [ ] Plugin system to support more logs and allows for in-house
-  customisations [#27](https://github.com/amank22/LogVue/issues/27)
+      customisations [#27](https://github.com/amank22/LogVue/issues/27)
 - [ ] Import event logs directly [#28](https://github.com/amank22/LogVue/issues/28)
 - [ ] A framework to validate logs directly with some set of rules directly in GUI
 - [ ] Create [feature request](https://github.com/amank22/LogVue/issues/new) and we can discuss
-
-
-
