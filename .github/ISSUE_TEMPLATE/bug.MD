@@ -1,5 +1,3 @@
-<!--- Provide a general summary of the issue in the Title above -->
-
 ---
 name: 🐞 Bug about: File a bug/issue title: '[BUG] <title>'
 labels: Bug, Needs Triage assignees: ''

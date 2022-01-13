@@ -1,4 +1,3 @@
-<!--- Provide a general summary of the issue in the Title above -->
 ---
 name: 🚀 Feature about: Suggest a new feature title: '[FEATURE] <title>'
 labels: feature assignees: ''

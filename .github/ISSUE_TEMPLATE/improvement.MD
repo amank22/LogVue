@@ -1,4 +1,3 @@
-<!--- Provide a general summary of the issue in the Title above -->
 ---
 name: 🧰 Change / Improvement about: Suggest improvement in existing feature title: '[IMPROVEMENT] <title>'
 labels: enhancement assignees: ''
