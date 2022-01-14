@@ -44,5 +44,4 @@ object Renderer {
             OS.JS, OS.Ios -> TODO("commonize me")
         }
     }
-
 }

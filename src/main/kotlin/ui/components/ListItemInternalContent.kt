@@ -87,7 +87,6 @@ private fun ListErrorContent(errorContent: ErrorContent, modifier: Modifier = Mo
                     }
                 }
             }
-
         }
     }
 }

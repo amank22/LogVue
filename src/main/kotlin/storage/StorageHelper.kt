@@ -13,7 +13,6 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermissions
 
-
 object StorageHelper {
 
     internal fun createDiskDb(): DB {
@@ -57,5 +56,4 @@ object StorageHelper {
         val dbName = "sessions.db"
         return File(dataDir, dbName)
     }
-
 }
