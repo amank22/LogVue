@@ -53,5 +53,4 @@ object SessionConfig {
         if (sessionId.isNullOrBlank()) return null
         return Db.getSessionInfo(sessionId)?.configs?.get(key)
     }
-
 }

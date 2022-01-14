@@ -9,7 +9,7 @@ plugins {
 }
 
 val r8: Configuration by configurations.creating
-fun appVersion() : String {
+fun appVersion(): String {
     val key = "APP_VERSION"
     return if (project.hasProperty(key)) {
         val version = project.property("APP_VERSION").toString()
@@ -108,10 +108,10 @@ compose.desktop {
     }
 }
 
-//tasks.withType<Jar>().configureEach {
+// tasks.withType<Jar>().configureEach {
 //    println("excluding meta")
 //    exclude("META-INF/*.RSA", "META-INF/*.SF","META-INF/*.DSA")
-//}
+// }
 
 buildConfig {
     className("AppBuildConfig")
