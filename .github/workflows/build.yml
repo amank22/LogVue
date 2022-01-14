@@ -112,10 +112,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: ffurrer2/extract-release-notes@v1.10.0
-        id: extract_release_notes
-        if: ${{ false }}
-
       - name: Build Changelog
         id: github_release
         uses: mikepenz/release-changelog-builder-action@v2

@@ -49,6 +49,8 @@
   ],
   "exclude_merge_branches": [
     "merge pull request",
-    "Merge pull request"
+    "Merge pull request",
+    "Restyle ",
+    "from CodeFactor"
   ]
 }
