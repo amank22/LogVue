@@ -2,8 +2,8 @@
 <br />
 <h1>
 <p align="center">
-<img src="https://raw.githubusercontent.com/amank22/LogVue/main/main_logo_dark.svg#gh-dark-mode-only" alt="Logo">
-<img src="https://raw.githubusercontent.com/amank22/LogVue/main/main_logo_light.svg#gh-light-mode-only" alt="Logo">
+<img src="https://raw.githubusercontent.com/amank22/LogVue/main/main_logo_dark.svg#gh-dark-mode-only" alt="Logo" width="300">
+<img src="https://raw.githubusercontent.com/amank22/LogVue/main/main_logo_light.svg#gh-light-mode-only" alt="Logo"  width="300">
 </p>
 </h1>
 <p align="center">
