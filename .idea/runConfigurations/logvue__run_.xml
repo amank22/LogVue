@@ -4,7 +4,7 @@
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$" />
       <option name="externalSystemIdString" value="GRADLE" />
-      <option name="scriptParameters" value="-PSENTRY_ENDPOINT=https://2a1231d6ba0b4619a606099b86bcbdd3@o1110883.ingest.sentry.io/6140013" />
+      <option name="scriptParameters" value="-PAPP_VERSION=1.0.3" />
       <option name="taskDescriptions">
         <list />
       </option>
