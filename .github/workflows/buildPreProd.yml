@@ -4,9 +4,10 @@ env:
   GITHUB_DEPLOY: 'false'
 
 on:
-  push:
-    tags:
-      - 'v*'
+  pull_request:
+    branches:
+      - main
+      - rel_*
     paths-ignore:
       - LICENSE
       - README.md
@@ -26,10 +27,10 @@ jobs:
     name: Build Package
     timeout-minutes: 15
     continue-on-error: false
-    if: github.event.base_ref == 'refs/heads/main'
+    # if: github.event_name  == 'pull_request'
 
     runs-on: ${{ matrix.os }}
-    environment: Production
+    environment: PreProd
     env:
       SENTRY_ENDPOINT: ${{ secrets.SENTRY_ENDPOINT }}
       SENTRY_DEBUG: ${{ secrets.SENTRY_DEBUG }}
@@ -68,18 +69,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      - name: Deploy to GitHub Packages (Linux)
-        id: gradle-deploy
-        if: env.GITHUB_DEPLOY == 'true' && runner.os == 'Linux'
-        run: |
-          ./gradlew deploy
-        env:
-          GITHUB_USER: ${{ github.repository_owner }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Gradle Build
         id: gradle-build
-        run: ./gradlew repackageUberJar package -PSENTRY_ENDPOINT=${{ env.SENTRY_ENDPOINT }} -PSENTRY_DEBUG=${{ env.SENTRY_DEBUG }}
+        run: ./gradlew package -PSENTRY_ENDPOINT=${{ env.SENTRY_ENDPOINT }}
 
       - name: Uploading ${{ matrix.os }} uber jar
         if: steps.gradle-build.outcome == 'success'
@@ -98,42 +90,3 @@ jobs:
           path: |
             ${{ steps.gradle-build.outputs.app_pkg_path }}
           if-no-files-found: error
-
-
-  release:
-    name: Release new version.
-    needs: [ build ]
-    if: startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check out the source code
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Build Changelog
-        id: github_release
-        uses: mikepenz/release-changelog-builder-action@v2
-        with:
-          configuration: ".github/config/configuration.json"
-          commitMode: true
-          ignorePreReleases: ${{ !contains(github.ref, '-') }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Download all the build artifacts
-        uses: actions/download-artifact@v2
-        with:
-          path: release-artifacts
-
-      - name: Github Release
-        uses: softprops/action-gh-release@v1
-        with:
-          body: ${{ steps.github_release.outputs.changelog }}
-          prerelease: ${{ contains(github.event.inputs.version, '-rc') || contains(github.event.inputs.version, '-b') || contains(github.event.inputs.version, '-a') }}
-          files: |
-            ${{ github.workspace }}/release-artifacts/**
-          fail_on_unmatched_files: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
