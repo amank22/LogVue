@@ -4,7 +4,8 @@ import java.io.Serializable
 
 data class SessionInfo(
     val description: String,
-    val appPackage: String
+    val appPackage: String,
+    val configs: HashMap<String, String>? = hashMapOf()
 ) : Serializable {
     companion object {
         private const val serialVersionUID = 1L

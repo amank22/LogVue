@@ -10,7 +10,9 @@ import com.googlecode.cqengine.index.radixinverted.InvertedRadixTreeIndex
 import com.googlecode.cqengine.index.radixreversed.ReversedRadixTreeIndex
 import com.googlecode.cqengine.query.parser.sql.SQLParser
 import models.LogItem
+import storage.SessionConfig
 import utils.AppLog
+import utils.ConfigConstants
 import utils.reportException
 import kotlin.reflect.KProperty1
 import kotlin.time.ExperimentalTime
@@ -66,9 +68,10 @@ fun registerPropertiesInParser(
     parser: SQLParser<LogItem>,
     indexedCollection: ConcurrentIndexedCollection<LogItem>
 ) {
+    val addIndex = SessionConfig.boolDefaultOn(ConfigConstants.QUERY_INDEX)
     val propertySet = hashSetOf<String>()
     list.forEach {
-        registerMapPropertiesInParser(it.properties, propertySet, parser, indexedCollection)
+        registerMapPropertiesInParser(it.properties, propertySet, parser, indexedCollection, addIndex)
     }
 }
 
@@ -77,18 +80,19 @@ private fun registerMapPropertiesInParser(
     propertySet: HashSet<String>,
     parser: SQLParser<LogItem>,
     indexedCollection: ConcurrentIndexedCollection<LogItem>,
+    addIndex: Boolean,
     parentKey: String = ""
 ) {
     properties.forEach { (k, v) ->
         if (!propertySet.contains(k)) {
             if (v is Map<*, *>) {
                 @Suppress("UNCHECKED_CAST") registerMapPropertiesInParser(
-                    v as Map<String, Any>, propertySet, parser, indexedCollection, "$parentKey$k."
+                    v as Map<String, Any>, propertySet, parser, indexedCollection, addIndex, "$parentKey$k."
                 )
             } else {
 //                println("Attribute : ${att.attributeName} with first value = $v and v class = ${v.javaClass.name}")
                 val key = "$parentKey$k"
-                registerAndAddIndex(v, key, parser, indexedCollection)
+                registerAndAddIndex(v, key, parser, indexedCollection, addIndex)
                 propertySet.add(k)
             }
         } else {
@@ -101,11 +105,17 @@ fun registerAndAddIndex(
     value: Any,
     key: String,
     parser: SQLParser<LogItem>,
-    indexedCollection: ConcurrentIndexedCollection<LogItem>
+    indexedCollection: ConcurrentIndexedCollection<LogItem>,
+    addIndex: Boolean
 ) {
     with(indexedCollection) {
+        if (!addIndex) {
+            addGenericAttribute(key, value, parser, false)
+            return
+        }
         if (key.isBlank()) {
             addGenericAttribute(key, value, parser)
+            return
         }
         when (value) {
             is String -> {
@@ -147,14 +157,17 @@ fun registerAndAddIndex(
 private fun ConcurrentIndexedCollection<LogItem>.addGenericAttribute(
     key: String,
     value: Any,
-    parser: SQLParser<LogItem>
+    parser: SQLParser<LogItem>,
+    addIndex: Boolean = true
 ) {
     val att: ParameterizedAttribute<Any> = ParameterizedAttribute(key, value.javaClass)
-    try {
-        addIndex(HashIndex.onAttribute(att))
-    } catch (e: IllegalStateException) {
-        // Maybe the index is already added
-        AppLog.d(e.message.orEmpty())
+    if (addIndex) {
+        try {
+            addIndex(HashIndex.onAttribute(att))
+        } catch (e: IllegalStateException) {
+            // Maybe the index is already added
+            AppLog.d(e.message.orEmpty())
+        }
     }
     parser.registerAttribute(att)
 }

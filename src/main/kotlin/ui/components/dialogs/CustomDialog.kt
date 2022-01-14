@@ -91,39 +91,35 @@ fun CustomDialog(
     Floats.constrainToRange(backgroundAlpha, 0.0f, 1.0f)
     Floats.constrainToRange(dialogWidthRatio, 0.1f, 1.0f)
     Floats.constrainToRange(dialogHeightRatio, 0.1f, 1.0f)
-    with(PopupAlertDialogProvider) {
-        AlertDialog(onDismissRequest) {
-            Dialog(
-                onCloseRequest = onDismissRequest,
-                state = rememberDialogState(width = Dp.Unspecified, height = Dp.Unspecified),
-                undecorated = true,
-                resizable = false,
-                transparent = true,
-                onKeyEvent = {
-                    if (it.key == Key.Escape) {
-                        onDismissRequest()
-                        true
-                    } else {
-                        false
-                    }
-                },
+    Dialog(
+        onCloseRequest = onDismissRequest,
+        state = rememberDialogState(width = Dp.Unspecified, height = Dp.Unspecified),
+        undecorated = true,
+        resizable = true,
+        transparent = true,
+        onKeyEvent = {
+            if (it.key == Key.Escape) {
+                onDismissRequest()
+                true
+            } else {
+                false
+            }
+        },
+    ) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .background(Color.DarkGray.copy(backgroundAlpha))
+                .clickable(MutableInteractionSource(), null) { onDismissRequest() },
+            contentAlignment = Alignment.Center
+        ) {
+            Surface(
+                Modifier
+                    .fillMaxWidth(dialogWidthRatio)
+                    .fillMaxHeight(dialogHeightRatio)
+                    .clickable(MutableInteractionSource(), null) {}, dialogShape, elevation = dialogElevation
             ) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .background(Color.DarkGray.copy(backgroundAlpha))
-                        .clickable(MutableInteractionSource(), null) { onDismissRequest() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Surface(
-                        Modifier
-                            .fillMaxWidth(dialogWidthRatio)
-                            .fillMaxHeight(dialogHeightRatio)
-                            .clickable(MutableInteractionSource(), null) {}, dialogShape, elevation = dialogElevation
-                    ) {
-                        content()
-                    }
-                }
+                content()
             }
         }
     }

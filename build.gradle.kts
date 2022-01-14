@@ -9,9 +9,28 @@ plugins {
 }
 
 val r8: Configuration by configurations.creating
+fun appVersion() : String {
+    val key = "APP_VERSION"
+    return if (project.hasProperty(key)) {
+        val version = project.property("APP_VERSION").toString()
+        println("Version = $version")
+        if (version.isBlank()) {
+            return "1.0.0"
+        }
+        if (version.matches(Regex("^[\\d]{1,3}.[\\d]{1,3}.[\\d]{1,4}"))) {
+            return version
+        }
+        if (version.matches(Regex("^v[\\d]{1,3}.[\\d]{1,3}.[\\d]{1,4}"))) {
+            return version.removePrefix("v")
+        }
+        "1.0.0"
+    } else {
+        "1.0.0"
+    }
+}
 
 group = "com.voxfinite"
-version = "1.0.0"
+version = appVersion()
 
 repositories {
     google()

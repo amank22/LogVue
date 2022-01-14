@@ -36,6 +36,10 @@ object Db {
         return sessionInfoMap[sessionId]
     }
 
+    fun updateSessionInfo(sessionId: String, sessionInfo: SessionInfo) {
+        sessionInfoMap[sessionId] = sessionInfo
+    }
+
     fun getAllSessions() = diskDb.getAllNames().filter { it.startsWith(PREFIX) }.sortedBy { getSessionNumber(it) }
 
     private fun getLastSessionNumber(): Int {

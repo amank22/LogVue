@@ -71,7 +71,7 @@ jobs:
 
       - name: Gradle Build
         id: gradle-build
-        run: ./gradlew package -PSENTRY_ENDPOINT=${{ env.SENTRY_ENDPOINT }}
+        run: ./gradlew repackageUberJar package -PSENTRY_ENDPOINT=${{ env.SENTRY_ENDPOINT }}
 
       - name: Uploading ${{ matrix.os }} uber jar
         if: steps.gradle-build.outcome == 'success'
