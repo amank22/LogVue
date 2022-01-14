@@ -40,6 +40,8 @@ jobs:
         jdk: [ 18 ]
 
     steps:
+      - name: Get the tag name
+            run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
       - name: Check out the source code
         uses: actions/checkout@v2
 
@@ -79,7 +81,7 @@ jobs:
 
       - name: Gradle Build
         id: gradle-build
-        run: ./gradlew repackageUberJar package -PSENTRY_ENDPOINT=${{ env.SENTRY_ENDPOINT }} -PSENTRY_DEBUG=${{ env.SENTRY_DEBUG }}
+        run: ./gradlew repackageUberJar package -PSENTRY_ENDPOINT=${{ env.SENTRY_ENDPOINT }} -PSENTRY_DEBUG=${{ env.SENTRY_DEBUG }} -PAPP_VERSION=${{ env.TAG }}
 
       - name: Uploading ${{ matrix.os }} uber jar
         if: steps.gradle-build.outcome == 'success'
