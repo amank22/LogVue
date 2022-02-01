@@ -65,12 +65,12 @@ compose.desktop {
             description = "Local Analytics"
             linux {
                 debMaintainer = "kapoor.aman22@gmail.com"
-                iconFile.set(project.file("logo_icon.png"))
+                iconFile.set(project.file("../logo_icon.png"))
             }
             macOS {
                 bundleID = "${project.group}.${project.rootProject.name}"
                 setDockNameSameAsPackageName = true
-                iconFile.set(project.file("logo_icon.icns"))
+                iconFile.set(project.file("../logo_icon.icns"))
 //                notarization {
 //                    appleID.set("test.app@example.com")
 //                    password.set("@keychain:NOTARIZATION_PASSWORD")
@@ -78,7 +78,7 @@ compose.desktop {
             }
             windows {
                 upgradeUuid = "8AEBC8BF-9C94-4D02-ACA8-AF543E0CEB98"
-                iconFile.set(project.file("logo_icon.ico"))
+                iconFile.set(project.file("../logo_icon.ico"))
             }
         }
     }
