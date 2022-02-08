@@ -1,4 +1,4 @@
-name: Logvue Build
+name: Logvue Build Pre-Prod
 
 env:
   GITHUB_DEPLOY: 'false'

@@ -1,8 +1,7 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.voxfinite.logvue.Dependencies
 
-val pf4jVersion: String by project
 val pluginsDir: File by rootProject.extra
 
 plugins {
@@ -21,7 +20,7 @@ val appMainClass = "com.voxfinite.logvue.app.MainKt"
 dependencies {
     implementation(kotlin("stdlib"))
     testImplementation(kotlin("test"))
-    implementation(project(":api"))
+    implementation(Dependencies.LogVueApi)
     implementation(compose.desktop.currentOs)
     // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.17.0")
@@ -40,7 +39,7 @@ dependencies {
     implementation("io.sentry:sentry-log4j2:5.6.0")
     // https://mvnrepository.com/artifact/net.harawata/appdirs
     implementation("net.harawata:appdirs:1.2.1")
-    implementation ("org.pf4j:pf4j:${pf4jVersion}")
+    implementation (Dependencies.Pf4j)
 
     r8("com.android.tools:r8:3.0.73")
 }

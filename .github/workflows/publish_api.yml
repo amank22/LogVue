@@ -1,0 +1,63 @@
+name: Logvue Publish
+
+env:
+  GITHUB_DEPLOY: 'false'
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    name: Release build and publish
+    continue-on-error: false
+
+    runs-on: ubuntu-latest
+    environment: Production
+    strategy:
+      fail-fast: true
+      matrix:
+        jdk: [ 18 ]
+
+    steps:
+      - name: Check out the source code
+        uses: actions/checkout@v2
+
+      - name: Download OpenJDK ${{ matrix.jdk }}
+        id: download-jdk
+        uses: sormuras/download-jdk@v1
+        with:
+          feature: ${{ matrix.jdk }}
+
+      - name: Set up OpenJDK ${{ matrix.jdk }}
+        id: setup-java
+        uses: actions/setup-java@v2
+        if: always() && steps.download-jdk.outcome == 'success'
+        with:
+          distribution: jdkfile
+          java-version: ${{ env.JDK_VERSION }}
+          jdkFile: ${{ env.JDK_FILE }}
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # Runs upload, and then closes & releases the repository
+      - name: Publish to MavenCentral
+        run: ./gradlew publishReleasePublicationToSonatypeRepository --max-workers 1 closeAndReleaseSonatypeStagingRepository
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+          SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
+          SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+          SONATYPE_STAGING_PROFILE_ID: ${{ secrets.SONATYPE_STAGING_PROFILE_ID }}
