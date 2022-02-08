@@ -62,6 +62,12 @@
   - Plain Yaml
 - Copy single analytics data in details section
 
+## Plugins
+
+You can extend LogVue with you own analytics platform.
+See [LogVue Templates](https://github.com/amank22/Logvue-Plugin-Template) for creating
+your own analytics parser for LogVue.
+
 ## Contribute
 
 Do you see any improvements or want to implement a missing feature? Contributions are very welcome!
@@ -83,8 +89,6 @@ before you start making any changes.
 
 ## Future goals
 
-- [ ] Plugin system to support more logs and allows for in-house
-      customisations [#27](https://github.com/amank22/LogVue/issues/27)
 - [ ] Import event logs directly [#28](https://github.com/amank22/LogVue/issues/28)
 - [ ] A framework to validate logs directly with some set of rules directly in GUI
 - [ ] Create [feature request](https://github.com/amank22/LogVue/issues/new) and we can discuss

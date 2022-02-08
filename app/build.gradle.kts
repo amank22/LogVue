@@ -1,8 +1,10 @@
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.voxfinite.logvue.Dependencies
+import com.voxfinite.logvue.utils.findPkg
+import com.voxfinite.logvue.utils.ghActionOutput
+import com.voxfinite.logvue.utils.getMainAppVersion
 
-val pf4jVersion: String by project
 val pluginsDir: File by rootProject.extra
 
 plugins {
@@ -14,14 +16,14 @@ plugins {
 val r8: Configuration by configurations.creating
 
 group = "com.voxfinite"
-version = appVersion()
+version = project.getMainAppVersion()
 val appName = "logvue"
 val appMainClass = "com.voxfinite.logvue.app.MainKt"
 
 dependencies {
     implementation(kotlin("stdlib"))
     testImplementation(kotlin("test"))
-    implementation(project(":api"))
+    implementation(Dependencies.LogVueApi)
     implementation(compose.desktop.currentOs)
     // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.17.0")
@@ -40,7 +42,7 @@ dependencies {
     implementation("io.sentry:sentry-log4j2:5.6.0")
     // https://mvnrepository.com/artifact/net.harawata/appdirs
     implementation("net.harawata:appdirs:1.2.1")
-    implementation ("org.pf4j:pf4j:${pf4jVersion}")
+    implementation (Dependencies.Pf4j)
 
     r8("com.android.tools:r8:3.0.73")
 }
@@ -154,41 +156,4 @@ gradle.buildFinished {
     val jarPkg = buildDir.resolve("compose/jars").findPkg(".jar")
     nativePkg.ghActionOutput("app_pkg")
     jarPkg.ghActionOutput("uber_jar")
-}
-
-fun File.findPkg(format: String?) = when (format != null) {
-    true -> walk().firstOrNull { it.isFile && it.name.endsWith(format, ignoreCase = true) }
-    else -> null
-}
-
-fun File?.ghActionOutput(prefix: String) = this?.let {
-    when (System.getenv("GITHUB_ACTIONS").toBoolean()) {
-        true -> println(
-            """
-        ::set-output name=${prefix}_name::${it.name}
-        ::set-output name=${prefix}_path::${it.absolutePath}
-      """.trimIndent()
-        )
-        else -> println("$prefix: $this")
-    }
-}
-
-fun appVersion() : String {
-    val key = "APP_VERSION"
-    return if (project.hasProperty(key)) {
-        val version = project.property("APP_VERSION").toString()
-        println("Version = $version")
-        if (version.isBlank()) {
-            return "1.0.0"
-        }
-        if (version.matches(Regex("^[\\d]{1,3}.[\\d]{1,3}.[\\d]{1,4}"))) {
-            return version
-        }
-        if (version.matches(Regex("^v[\\d]{1,3}.[\\d]{1,3}.[\\d]{1,4}"))) {
-            return version.removePrefix("v")
-        }
-        "1.0.0"
-    } else {
-        "1.0.0"
-    }
 }

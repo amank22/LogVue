@@ -1,0 +1,68 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+apply plugin: 'org.jetbrains.dokka'
+
+java {
+    withSourcesJar()
+}
+
+tasks.withType(dokkaHtmlPartial.getClass()).configureEach {
+    pluginsMapConfiguration.set(
+            ["org.jetbrains.dokka.base.DokkaBase": """{ "separateInheritedMembers": true}"""]
+    )
+}
+
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+    archiveClassifier.set('javadoc')
+    from dokkaJavadoc.outputDirectory
+}
+
+group = PUBLISH_GROUP_ID
+version = PUBLISH_VERSION
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId PUBLISH_GROUP_ID
+                artifactId PUBLISH_ARTIFACT_ID
+                version PUBLISH_VERSION
+                from components.java
+                artifact javadocJar
+
+                pom {
+                    name = PUBLISH_ARTIFACT_ID
+                    description = 'Monitor, analyse local analytics from ADB and use SQL-Like query to filter logs on desktop'
+                    url = 'https://github.com/amank22/LogVue'
+                    licenses {
+                        license {
+                            name = 'GPL-3.0 License'
+                            url = 'https://github.com/amank22/LogVue/blob/main/LICENSE'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'amank22'
+                            name = 'Aman Kapoor'
+                            email = 'kapoor.aman22@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:github.com/amank22/logvue.git'
+                        developerConnection = 'scm:git:ssh://github.com/amank22/logvue.git'
+                        url = 'https://github.com/amank22/LogVue/tree/main'
+                    }
+                }
+            }
+        }
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(
+            rootProject.ext["signing.keyId"],
+            rootProject.ext["signing.key"],
+            rootProject.ext["signing.password"],
+    )
+    sign publishing.publications
+}
