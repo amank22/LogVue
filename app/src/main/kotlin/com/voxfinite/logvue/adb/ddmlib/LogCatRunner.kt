@@ -16,7 +16,7 @@ import javax.annotation.concurrent.GuardedBy
 class LogCatRunner(
     val mDevice: IDevice,
     pid: Long,
-    filters: Array<String> = arrayOf("FA", "FA-SVC")
+    filters: List<String>
 ) {
 
     companion object {

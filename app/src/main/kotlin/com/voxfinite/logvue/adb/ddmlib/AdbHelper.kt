@@ -62,7 +62,7 @@ object AdbHelper {
     @OptIn(ExperimentalCoroutinesApi::class)
     fun monitorLogs(
         packageName: String,
-        filters: Array<String> = arrayOf("FA", "FA-SVC", "PDTLogging")
+        filters: List<String>
     ) = callbackFlow {
         stopLogs = false
         val currentSelectedDevice = Devices.currentDevice?.device

@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.sp
 import com.voxfinite.logvue.models.EventTypeNotSure
 import com.voxfinite.logvue.api.models.LogItem
 import com.voxfinite.logvue.ui.CustomTheme
+import com.voxfinite.logvue.ui.components.common.CustomImage
+import com.voxfinite.logvue.ui.components.common.NetworkImage
 import com.voxfinite.logvue.ui.views.flow.FlowRow
 import com.voxfinite.logvue.utils.Helpers
 import com.voxfinite.logvue.utils.predictedEventType
@@ -94,8 +96,7 @@ fun LogTitle(logItem: LogItem, modifier: Modifier = Modifier) {
 fun LogIcon(logItem: LogItem, modifier: Modifier = Modifier) {
     Box(modifier.size(48.dp)) {
         val sourceIcon = logItem.source.icon
-        val sourceIconPainter = painterResource(sourceIcon)
-        Image(sourceIconPainter, logItem.source.type, Modifier.size(36.dp))
+        CustomImage(sourceIcon, logItem.source.type, Modifier.size(36.dp))
         val predictedEventType = logItem.predictedEventType()
         if (predictedEventType != EventTypeNotSure) {
             val typePainter = painterResource(predictedEventType.iconResource)
