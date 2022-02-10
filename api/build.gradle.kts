@@ -7,7 +7,7 @@ plugins {
 
 ext {
     set("PUBLISH_GROUP_ID", Configuration.Api.artifactGroup)
-    if (Configuration.Api.isSnapshot || rootProject.ext["snapshot"] as Boolean) {
+    if (Configuration.Api.isSnapshot || rootProject.ext["snapshot"] as? Boolean == true) {
         set("PUBLISH_VERSION", Configuration.Api.snapshotVersionName)
     } else {
         set("PUBLISH_VERSION", Configuration.Api.versionName)
