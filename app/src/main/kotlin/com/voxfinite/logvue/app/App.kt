@@ -21,6 +21,7 @@ import com.voxfinite.logvue.ui.components.SideNavigation
 import com.voxfinite.logvue.ui.components.dialogs.CrashDialog
 import com.voxfinite.logvue.ui.components.dialogs.IntroDialog
 import com.voxfinite.logvue.utils.*
+import com.voxfinite.logvue.utils.plugins.PluginsHelper
 
 @Composable
 @Preview

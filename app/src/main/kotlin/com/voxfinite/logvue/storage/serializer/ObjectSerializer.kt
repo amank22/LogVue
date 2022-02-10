@@ -1,5 +1,6 @@
 package com.voxfinite.logvue.storage.serializer
 
+import com.voxfinite.logvue.utils.plugins.PluginsHelper
 import org.mapdb.CC
 import org.mapdb.DataInput2
 import org.mapdb.DataOutput2
@@ -53,7 +54,7 @@ class ObjectSerializer<T>(val classLoader: ClassLoader = Thread.currentThread().
     /**
      * Loader must be non-null;
      */
-        (`in`: InputStream?) : ObjectInputStream(`in`) {
+        (inputStream: InputStream?) : ObjectInputStream(inputStream) {
         /**
          * Use the given ClassLoader rather than using the system class
          */
@@ -61,8 +62,8 @@ class ObjectSerializer<T>(val classLoader: ClassLoader = Thread.currentThread().
         override fun resolveClass(desc: ObjectStreamClass): Class<*> {
             val name = desc.name
             return try {
-                Class.forName(name, false, classLoader)
-            } catch (ex: ClassNotFoundException) {
+                PluginsHelper.tryResolveClass(name)
+            } catch (ignore: ClassNotFoundException) {
                 super.resolveClass(desc)
             }
         }

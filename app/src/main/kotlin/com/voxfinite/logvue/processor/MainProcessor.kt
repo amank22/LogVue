@@ -1,6 +1,5 @@
 package com.voxfinite.logvue.processor
 
-import com.voxfinite.logvue.api.models.LogLevel2
 import com.voxfinite.logvue.adb.AndroidLogStreamer
 import com.voxfinite.logvue.adb.LogCatErrors
 import com.voxfinite.logvue.adb.LogErrorNoSession
@@ -17,6 +16,7 @@ import com.voxfinite.logvue.api.models.LogItem
 import com.voxfinite.logvue.models.SessionInfo
 import com.voxfinite.logvue.storage.Db
 import com.voxfinite.logvue.utils.*
+import com.voxfinite.logvue.utils.plugins.PluginsHelper
 
 class MainProcessor {
 
@@ -82,8 +82,9 @@ class MainProcessor {
             return@withContext
         }
         val packageName = sessionInfo.appPackage
-        val stream = streamer.stream(packageName)
         val parsers = PluginsHelper.parsers()
+        val filters = parsers.map { it.filters() }.flatten()
+        val stream = streamer.stream(packageName, filters)
         launch {
             val successStream = stream.filter { it.isSuccess }.map { it.getOrNull() }
                 .filterNotNull()

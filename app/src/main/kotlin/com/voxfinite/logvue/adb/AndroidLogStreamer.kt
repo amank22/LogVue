@@ -7,8 +7,8 @@ import com.voxfinite.logvue.utils.Either
 
 class AndroidLogStreamer {
 
-    fun stream(packageName: String): Flow<Either<LogCatErrors, ArrayList<LogCatMessage2>>> {
-        return AdbHelper.monitorLogs(packageName)
+    fun stream(packageName: String, filters: List<String>): Flow<Either<LogCatErrors, ArrayList<LogCatMessage2>>> {
+        return AdbHelper.monitorLogs(packageName, filters)
     }
 
     fun stop() {
