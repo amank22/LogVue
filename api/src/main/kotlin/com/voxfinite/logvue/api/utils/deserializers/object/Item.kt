@@ -18,7 +18,7 @@ import java.util.regex.Pattern
  */
 
 internal val objectPattern = Pattern.compile(
-    "(^[A-Z]\\S*)[ ]?(\\((.*)\\)$)|(\\[(.*)]$)",
+    "(^[A-Z]\\S*)[| ](\\((.*)\\)$)|(\\[(.*)]$)",
     Pattern.DOTALL
 )
 internal val mapPattern = Pattern.compile(

@@ -89,7 +89,7 @@ object AdbHelper {
             awaitClose()
             return@callbackFlow
         }
-        val logTask = LogCatRunner(currentSelectedDevice, clientPid.toLong(), filters)
+        val logTask = LogCatRunner(currentSelectedDevice, clientPid, filters)
         val listener: (msgList: ArrayList<LogCatMessage2>) -> Unit = {
             if (stopLogs) {
                 close()

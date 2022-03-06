@@ -9,7 +9,7 @@ val pluginsDir: File by rootProject.extra
 
 plugins {
     kotlin("jvm")
-    id("org.jetbrains.compose") version "1.0.1"
+    id("org.jetbrains.compose") version "1.1.0"
     id("com.github.gmazzo.buildconfig") version "3.0.3"
 }
 

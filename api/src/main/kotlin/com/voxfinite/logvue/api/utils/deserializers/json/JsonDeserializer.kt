@@ -1,5 +1,6 @@
 package com.voxfinite.logvue.api.utils.deserializers.json
 
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonParseException
 import com.google.gson.JsonSyntaxException
@@ -10,7 +11,7 @@ import com.voxfinite.logvue.api.utils.hashMapEntityOf
 
 object JsonDeserializer {
 
-    private val gson by lazy {
+    internal val gson: Gson by lazy {
         val gsonBuilder = GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
         gsonBuilder.setPrettyPrinting()
         gsonBuilder.create()

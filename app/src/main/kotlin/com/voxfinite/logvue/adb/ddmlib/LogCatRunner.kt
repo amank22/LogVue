@@ -15,7 +15,7 @@ import javax.annotation.concurrent.GuardedBy
 
 class LogCatRunner(
     val mDevice: IDevice,
-    pid: Long,
+    pid: Int,
     filters: List<String>
 ) {
 
@@ -41,10 +41,11 @@ class LogCatRunner(
     private val mParser = LogCatMessageParser()
 
     private val mCancelled = AtomicBoolean(false)
-    private val mReceiver = LogCatOutputReceiver()
+    private val mReceiver = LogCatOutputReceiver(pid)
 
     // TODO: Check if filters is empty then show all logs
-    private val logcatCommand = "logcat -s ${filters.joinToString(" ")} --pid=$pid -v long"
+    private val logcatCommand = "logcat -s ${filters.joinToString(" ")} -v long"
+//    private val logcatCommand = "logcat -s ${filters.joinToString(" ")} --pid=$pid -v long"
 
     @GuardedBy("this")
     private val mListeners = hashSetOf<LogCatListener2>()
@@ -78,7 +79,7 @@ class LogCatRunner(
         mCancelled.set(true)
     }
 
-    private inner class LogCatOutputReceiver : MultiLineReceiver() {
+    private inner class LogCatOutputReceiver(val pid: Int) : MultiLineReceiver() {
         init {
             setTrimLine(false)
         }
@@ -95,7 +96,13 @@ class LogCatRunner(
         }
 
         private fun processLogLines(lines: Array<String>) {
-            val newMessages: List<LogCatMessage2> = mParser.processLogLines(lines, mDevice).map { it.to2() }
+            val newMessages: List<LogCatMessage2> = mParser.processLogLines(lines, mDevice)
+                .mapNotNull {
+                    if (it.header.pid != pid) return@mapNotNull null
+                    // TODO: com.google.android.gms is used on some(maybe newer) firebase analytics
+                    //
+                    it.to2()
+                }
             if (newMessages.isNotEmpty()) {
                 notifyListeners(arrayListOf<LogCatMessage2>().also { logCatMessage2s ->
                     logCatMessage2s.addAll(
