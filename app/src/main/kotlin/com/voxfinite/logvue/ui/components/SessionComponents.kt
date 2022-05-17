@@ -76,7 +76,7 @@ fun SessionsList(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(Modifier.height(36.dp), Arrangement.Center) {
-                    Text(session.description, maxLines = 1)
+                    Text(session.description, maxLines = 1, style = CustomTheme.typography.headings.h6Semi)
                     Text(session.appPackage, style = CustomTheme.typography.headings.caption, maxLines = 1)
                 }
                 if (showDeleteIcon) {

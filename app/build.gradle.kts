@@ -23,7 +23,8 @@ val appMainClass = "com.voxfinite.logvue.app.MainKt"
 dependencies {
     implementation(kotlin("stdlib"))
     testImplementation(kotlin("test"))
-    implementation(Dependencies.LogVueApi)
+    implementation(project(":api"))
+//    implementation(Dependencies.LogVueApi)
     implementation(compose.desktop.currentOs)
     // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.17.0")

@@ -33,7 +33,7 @@ fun SettingsDialog(onDismissRequest: () -> Unit) {
     SimpleVerticalDialog(header = "Settings", onDismissRequest = onDismissRequest) {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             stickyHeader("h1-General") {
-                ItemHeader("General", Modifier.fillMaxWidth().background(CustomTheme.colors.componentBackground))
+                ItemHeader("General", Modifier.fillMaxWidth())
             }
             item("darkMode") {
                 DarkModeSwitch()
@@ -45,7 +45,7 @@ fun SettingsDialog(onDismissRequest: () -> Unit) {
                 Divider(color = CustomTheme.colors.componentOutline, thickness = (0.5).dp)
             }
             stickyHeader("h1-other") {
-                ItemHeader("Other", Modifier.fillMaxWidth().background(CustomTheme.colors.componentBackground))
+                ItemHeader("Other", Modifier.fillMaxWidth())
             }
             item("feedback") {
                 Feedback()

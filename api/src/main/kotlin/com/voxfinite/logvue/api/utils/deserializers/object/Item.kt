@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory
 import java.io.StreamTokenizer
 import java.io.StringReader
 import java.util.*
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 /**
@@ -17,28 +18,45 @@ import java.util.regex.Pattern
  * @author dschreiber
  */
 
-internal val objectPattern = Pattern.compile(
-    "(^[A-Z]\\S*)[| ](\\((.*)\\)$)|(\\[(.*)]$)",
+//internal val objectPattern = Pattern.compile(
+//    "(^[A-Z]\\S*)(\\[(.*)]\$)",
+//    Pattern.DOTALL
+//)
+//internal val objectPattern1 = Pattern.compile(
+//    "(^[A-Z]\\S*) (\\[(.*)]\$)",
+//    Pattern.DOTALL
+//)
+internal val objectPattern2 = Pattern.compile(
+    "(?<type>^[A-Z]\\S*)(| )((\\((?<object>.*)\\)$)|(\\[(?<object1>.*)]$))",
     Pattern.DOTALL
 )
+
+// (^[A-Z]\S*)(\[(.*)]$)
+// (^[A-Z]\S*) (\[(.*)]$)
+// "(^[A-Z]\\S*)[| ](\\((.*)\\)$)|(\\[(.*)]$)"
 internal val mapPattern = Pattern.compile(
     "\\{.*=.*}",
     Pattern.DOTALL
 )
 
-sealed class Item(val stringRepresentation: String?) {
+sealed class Item(private val stringRepresentation: String?) {
     class ValueItem(stringRepresentation: String?) : Item(stringRepresentation)
 
     class ObjectItem(stringRepresentation: String) : Item(stringRepresentation) {
-        var type: String? = null
-        private val attributes: MutableMap<String, Item> = HashMap()
+        private val attributes: MutableMap<String, Any> = hashMapOf()
 
         init {
-            val typeMatcher = objectPattern.matcher(stringRepresentation)
+            val typeMatcher = objectPattern2.matcher(stringRepresentation)
             if (typeMatcher.matches()) {
-                type = typeMatcher.group(1)
+                val objectString = findObjectInMatcher(typeMatcher)
+                if (objectString.isNullOrBlank()) {
+                    throw IllegalArgumentException(
+                        "cannot create object from string: " +
+                                stringRepresentation
+                    )
+                }
                 val onFirstLevelCommaRespectEqualSign =
-                    splitOnFirstLevelCommaRespectEqualSign(typeMatcher.group(2))
+                    splitOnFirstLevelCommaRespectEqualSign(objectString)
                 for (attributeValue: String in onFirstLevelCommaRespectEqualSign) {
                     val split: Iterator<String> = Splitter.on("=").trimResults()
                         .limit(2).split(attributeValue).iterator()
@@ -54,14 +72,23 @@ sealed class Item(val stringRepresentation: String?) {
             }
         }
 
-        fun getAttributes(): Map<String, Item> {
-            return attributes
+        private fun findObjectInMatcher(typeMatcher: Matcher): String? {
+            val g1 = try {
+                typeMatcher.group("object1")
+            } catch (e: Exception) {
+                try {
+                    typeMatcher.group("object")
+                } catch (e: Exception) {
+                    null
+                }
+            }
+            return g1?.removePrefix("{")?.removeSuffix("}")
         }
+
+        fun getAttributes() = attributes
 
         override fun toString(): String {
             return (super.toString() +
-                    "\n Type=" +
-                    type +
                     "\n  " +
                     Joiner.on("\n  ").withKeyValueSeparator(" = ")
                         .join(attributes))
@@ -69,7 +96,7 @@ sealed class Item(val stringRepresentation: String?) {
     }
 
     class MapItem(stringRepresentation: String) : Item(stringRepresentation) {
-        private val attributes: MutableMap<String, Item> = hashMapOf()
+        private val attributes: MutableMap<String, Any> = hashMapOf()
 
         init {
             val typeMatcher = mapPattern.matcher(stringRepresentation)
@@ -87,9 +114,7 @@ sealed class Item(val stringRepresentation: String?) {
             }
         }
 
-        fun getAttributes(): Map<String, Item> {
-            return attributes
-        }
+        fun getAttributes() = attributes
 
         override fun toString(): String {
             return (super.toString() +
@@ -99,7 +124,7 @@ sealed class Item(val stringRepresentation: String?) {
     }
 
     class ListItem(stringRepresentation: String) : Item(stringRepresentation) {
-        private val values: MutableList<Item> = ArrayList()
+        val values: MutableList<Any> = arrayListOf()
 
         init {
             // remove "[" and "]":
@@ -265,19 +290,19 @@ sealed class Item(val stringRepresentation: String?) {
             return result
         }
 
-        fun parseString(stringRaw: String?): Item {
+        fun parseString(stringRaw: String?): Any {
             if (stringRaw.isNullOrBlank()) {
-                return ValueItem(stringRaw)
+                return ObjectDeserializer.tryParseToType(stringRaw)
             }
             val string = stringRaw.trim { it <= ' ' }
             return if (string.startsWith("[")) {
-                ListItem(string)
-            } else if (objectPattern.matcher(string).matches() && string.contains("=")) {
-                ObjectItem(string)
+                ListItem(string).values
+            } else if (objectPattern2.matcher(string).matches() && string.contains("=")) {
+                ObjectItem(string).getAttributes()
             } else if (mapPattern.matcher(string).matches() && string.contains("=")) {
-                MapItem(string)
+                MapItem(string).getAttributes()
             } else {
-                ValueItem(string)
+                ObjectDeserializer.tryParseToType(stringRaw)
             }
         }
     }

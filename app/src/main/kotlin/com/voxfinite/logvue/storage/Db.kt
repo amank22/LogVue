@@ -40,7 +40,10 @@ object Db {
         sessionInfoMap[sessionId] = sessionInfo
     }
 
-    fun getAllSessions() = diskDb.getAllNames().filter { it.startsWith(PREFIX) }.sortedBy { getSessionNumber(it) }
+    fun getAllSessions(): List<String> {
+        val all = diskDb.getAllNames().filter { it.startsWith(PREFIX) }.sortedBy { getSessionNumber(it) }
+        return all.filter { getSessionInfo(it) != null }
+    }
 
     private fun getLastSessionNumber(): Int {
         val lastSessionId = getAllSessions().lastOrNull() ?: sessionIdFromNumber(0)

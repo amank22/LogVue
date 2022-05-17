@@ -8,10 +8,6 @@ import java.util.HashMap
 
 object ObjectDeserializer {
 
-    private val objectMapper by lazy {
-        ItemObjectMapper()
-    }
-
     private val parser = TypeParser.newBuilder().build()
 
     fun map(message: String?): HashMapEntity<String, Any> {
@@ -29,17 +25,17 @@ object ObjectDeserializer {
         return hashMapEntityOf(properties)
     }
 
-    internal fun tryParseToType(str: String?): Any? {
+    internal fun tryParseToType(str: String?): Any {
         return try {
             tryParseInternal(str)
         } catch (ve: ValueException) {
-            ve.value
+            ve.value ?: "null"
         }
     }
 
     @Throws(ValueException::class)
-    private fun tryParseInternal(str: String?): Any? {
-        if (str == null) return null
+    private fun tryParseInternal(str: String?): Any {
+        if (str == null) return "null"
         if (str.isBlank()) return str
         var parsed: Boolean
         parsed = tryParseType(str, Boolean::class.java)

@@ -38,7 +38,7 @@ fun App() {
                 processor, sessionId, Modifier.fillMaxHeight().weight(0.2f)
                     .background(CustomTheme.colors.componentBackground)
             ) {
-                sessionId = it.orEmpty()
+                sessionId = it
             }
             Divider(Modifier.fillMaxHeight().width(1.dp).background(Color.LightGray.copy(alpha = 0.3f)))
             BodyPanel(processor, sessionId, Modifier.fillMaxHeight().weight(0.8f))
