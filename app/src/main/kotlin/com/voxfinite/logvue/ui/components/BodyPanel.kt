@@ -13,11 +13,15 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.voxfinite.logvue.adb.LogCatErrors
@@ -32,6 +36,7 @@ import com.voxfinite.logvue.ui.CustomTheme
 import com.voxfinite.logvue.ui.components.dialogs.ExportDialog
 import com.voxfinite.logvue.utils.AppSettings
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun BodyPanel(
     processor: MainProcessor,
@@ -67,19 +72,36 @@ fun BodyPanel(
         }
     }
 
-    Column(modifier) {
-        var actionMenuItems by remember(sessionId) { mutableStateOf(ActionMenu.DefaultList) }
-        val currentDevice by Devices.currentDeviceFlow.collectAsState()
-        var errorString by remember(currentDevice) {
-            mutableStateOf(if (currentDevice == null) "No device is connected" else "")
-        }
+    var actionMenuItems by remember(sessionId) { mutableStateOf(ActionMenu.DefaultList) }
+    val currentDevice by Devices.currentDeviceFlow.collectAsState()
+    var errorString by remember(currentDevice) {
+        mutableStateOf(if (currentDevice == null) "No device is connected" else "")
+    }
 
-        val onError: (logError: LogCatErrors) -> Unit = {
+    val onError: (logError: LogCatErrors) -> Unit = {
+        actionMenuItems = ActionMenu.DefaultList
+        streamRunning = false
+        errorString = logcatErrorString(it)
+    }
+
+    fun pauseStream() {
+        if (streamRunning) {
+            pauseProcessor(processor)
             actionMenuItems = ActionMenu.DefaultList
             streamRunning = false
-            errorString = logcatErrorString(it)
         }
+    }
 
+    fun startStream() {
+        if (!streamRunning) {
+            streamData(processor, scope, onError, onNewMessage)
+            actionMenuItems = ActionMenu.PauseList
+            streamRunning = true
+            errorString = ""
+        }
+    }
+
+    Column(modifier) {
         BodyHeader(
             sessionId,
             Modifier.fillMaxWidth().background(CustomTheme.colors.componentBackground),
@@ -115,15 +137,10 @@ fun BodyPanel(
                             isOpen = true
                         }
                         ActionPause -> {
-                            pauseProcessor(processor)
-                            actionMenuItems = ActionMenu.DefaultList
-                            streamRunning = false
+                            pauseStream()
                         }
                         ActionStart -> {
-                            streamData(processor, scope, onError, onNewMessage)
-                            actionMenuItems = ActionMenu.PauseList
-                            streamRunning = true
-                            errorString = ""
+                            startStream()
                         }
                     }
                 }

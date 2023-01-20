@@ -23,7 +23,6 @@ import com.voxfinite.logvue.models.SessionInfo
 import com.voxfinite.logvue.ui.CustomTheme
 import com.voxfinite.logvue.ui.components.dialogs.StyledCustomVerticalDialog
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun NewSessionBox(onDismissRequest: () -> Unit, onButtonClick: (sessionInfo: SessionInfo) -> Unit) {
     StyledCustomVerticalDialog(onDismissRequest = onDismissRequest) {

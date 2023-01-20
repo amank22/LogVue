@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -51,13 +53,12 @@ fun SessionsList(
             var showDeleteIcon by remember(it) { mutableStateOf(false) }
             var modifier1 = Modifier
                 .clip(shape)
-                .pointerMoveFilter(onEnter = {
+                .onPointerEvent(PointerEventType.Enter) {
                     showDeleteIcon = true
-                    false
-                }, onExit = {
+                }
+                .onPointerEvent(PointerEventType.Exit) {
                     showDeleteIcon = false
-                    false
-                })
+                }
                 .clickable {
                     if (!processor.isSameSession(it)) {
                         processor.startOldSession(it)
@@ -82,6 +83,7 @@ fun SessionsList(
                 if (showDeleteIcon) {
                     IconButton({
                         processor.deleteSession(it)
+                        onSessionChange(processor.getCurrentSessionId())
                         onSessionDelete()
                     }, Modifier.size(36.dp).padding(end = 16.dp)) {
                         Icon(painterResource("icons/ico-trashcan.svg"), "delete session")

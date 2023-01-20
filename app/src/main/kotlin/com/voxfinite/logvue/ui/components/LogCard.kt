@@ -33,7 +33,7 @@ fun LogCard(logItem: LogItem, modifier: Modifier = Modifier, onClick: (logItem: 
     val elevation = if (logItem.isSelected) 3.dp else 0.dp
     Card({
         onClick(logItem)
-    }, modifier, indication = null, elevation = elevation) {
+    }, modifier, elevation = elevation) {
         LogCardContent(logItem)
     }
 }

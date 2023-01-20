@@ -62,6 +62,11 @@
   - Plain Yaml
 - Copy single analytics data in details section
 
+### Shortcuts
+
+- Press `R` to start capturing logcat data
+- Press `P` to stop capturing logcat data
+
 ## Plugins
 
 You can extend LogVue with you own analytics platform.

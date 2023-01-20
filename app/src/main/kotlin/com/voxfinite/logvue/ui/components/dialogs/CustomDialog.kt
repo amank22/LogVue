@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -77,7 +78,7 @@ fun SimpleVerticalDialog(
 }
 
 @Suppress("UnstableApiUsage")
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CustomDialog(
     backgroundAlpha: Float = 0.5f,
@@ -95,7 +96,7 @@ fun CustomDialog(
         onCloseRequest = onDismissRequest,
         state = rememberDialogState(width = Dp.Unspecified, height = Dp.Unspecified),
         undecorated = true,
-        resizable = true,
+        resizable = false,
         transparent = true,
         onKeyEvent = {
             if (it.key == Key.Escape) {
@@ -109,7 +110,7 @@ fun CustomDialog(
         Box(
             Modifier
                 .fillMaxSize()
-                .background(Color.DarkGray.copy(backgroundAlpha))
+                .background(Color.DarkGray.copy(alpha = backgroundAlpha))
                 .clickable(MutableInteractionSource(), null) { onDismissRequest() },
             contentAlignment = Alignment.Center
         ) {

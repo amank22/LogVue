@@ -10,13 +10,13 @@ buildscript {
     }
 
     dependencies {
-        classpath(kotlin("gradle-plugin", version = "1.6.10"))
+        classpath(kotlin("gradle-plugin", version = "1.7.20"))
     }
 }
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.dokka") version "1.6.10"
+    kotlin("jvm") version "1.7.20"
+    id("org.jetbrains.dokka") version "1.7.20"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 
@@ -30,10 +30,10 @@ allprojects {
 
 subprojects {
     tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions.languageVersion = "1.6"
-        kotlinOptions.apiVersion = "1.6"
+        kotlinOptions.languageVersion = "1.7"
+        kotlinOptions.apiVersion = "1.7"
         kotlinOptions.jvmTarget = "16"
-        kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 }
 

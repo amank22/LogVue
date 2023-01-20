@@ -170,7 +170,7 @@ private fun customColors(isLightTheme: Boolean, alertColors: CustomAlertColors) 
     )
 }
 
-// Use with eg. CustomTheme.elevation.small
+// Use with e.g. CustomTheme.elevation.small
 object CustomTheme {
     val colors: CustomColors
         @Composable

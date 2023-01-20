@@ -6,18 +6,15 @@ import com.android.ddmlib.IDevice
 import com.android.ddmlib.Log
 import com.voxfinite.logvue.adb.LogErrorDeviceNotConnected
 import com.voxfinite.logvue.adb.LogErrorPackageIssue
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.cancellable
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
 import com.voxfinite.logvue.api.models.LogCatMessage2
 import com.voxfinite.logvue.utils.Either
 import com.voxfinite.logvue.utils.reportException
+import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -59,7 +56,6 @@ object AdbHelper {
 
     private var stopLogs = false
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun monitorLogs(
         packageName: String,
         filters: List<String>
@@ -72,7 +68,7 @@ object AdbHelper {
             return@callbackFlow
         }
         currentSelectedDevice.emptyShellCommand("setprop log.tag.FA VERBOSE")
-        currentSelectedDevice.emptyShellCommand("setprop log.tag.FA-SVC VERBOSE")
+//        currentSelectedDevice.emptyShellCommand("setprop log.tag.FA-SVC VERBOSE")
         val client = currentSelectedDevice.getClient(packageName)
         var clientPid = -1
         if (client == null) {
@@ -98,7 +94,7 @@ object AdbHelper {
             }
         }
         logTask.addLogCatListener(listener)
-        thread {
+        launch(Dispatchers.IO) {
             logTask.run()
         }
         awaitClose {

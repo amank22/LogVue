@@ -9,7 +9,7 @@ val pluginsDir: File by rootProject.extra
 
 plugins {
     kotlin("jvm")
-    id("org.jetbrains.compose") version "1.1.0"
+    id("org.jetbrains.compose") version "1.2.2"
     id("com.github.gmazzo.buildconfig") version "3.0.3"
 }
 
@@ -27,25 +27,25 @@ dependencies {
 //    implementation(Dependencies.LogVueApi)
     implementation(compose.desktop.currentOs)
     // https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.17.0")
-    implementation("org.apache.logging.log4j:log4j-api:2.17.0")
-    implementation("org.apache.logging.log4j:log4j-core:2.17.0")
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.19.0")
+    implementation("org.apache.logging.log4j:log4j-api:2.19.0")
+    implementation("org.apache.logging.log4j:log4j-core:2.19.0")
     // embedded database
-    implementation("org.mapdb:mapdb:3.0.8")
-    implementation("org.snakeyaml:snakeyaml-engine:2.3")
+    implementation("org.mapdb:mapdb:3.0.9")
+    implementation("org.snakeyaml:snakeyaml-engine:2.4")
 //    runtimeOnly("io.netty:netty-resolver-dns-native-macos:4.1.72.Final") // not sure if needed now
     implementation("com.android.tools.ddms:ddmlib:30.2.0-alpha06")
-    implementation("com.google.code.gson:gson:2.8.9")
+    implementation("com.google.code.gson:gson:2.10.1")
     // https://mvnrepository.com/artifact/com.googlecode.cqengine/cqengine
     implementation("com.googlecode.cqengine:cqengine:3.6.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
 
-    implementation("io.sentry:sentry-log4j2:5.6.0")
+    implementation("io.sentry:sentry-log4j2:6.12.0")
     // https://mvnrepository.com/artifact/net.harawata/appdirs
     implementation("net.harawata:appdirs:1.2.1")
     implementation (Dependencies.Pf4j)
 
-    r8("com.android.tools:r8:3.0.73")
+    r8("com.android.tools:r8:4.0.48")
 }
 
 tasks.test {

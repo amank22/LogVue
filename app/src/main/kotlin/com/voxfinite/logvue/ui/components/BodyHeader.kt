@@ -28,7 +28,7 @@ fun BodyHeader(
     onFilterUpdated: (filterText: String) -> Unit
 ) = FilterSearchHeader(modifier, sessionId, filtersEnabled, onFilterUpdated)
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun FilterSearchHeader(
     modifier: Modifier,

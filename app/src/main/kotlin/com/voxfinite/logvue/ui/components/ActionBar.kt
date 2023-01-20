@@ -5,11 +5,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.voxfinite.logvue.ui.views.flow.FlowRow
+import com.voxfinite.logvue.utils.GlobalOp
+import com.voxfinite.logvue.utils.globalOpsFlow
 
 @Composable
 fun ActionBar(
@@ -17,6 +20,17 @@ fun ActionBar(
     modifier: Modifier = Modifier,
     onMenuClick: (action: ActionMenu) -> Unit
 ) {
+    val globalOpState = globalOpsFlow.collectAsState()
+
+    when(globalOpState.value) {
+        GlobalOp.StartStream -> {
+            onMenuClick(ActionStart)
+        }
+        GlobalOp.PauseStream -> {
+            onMenuClick(ActionPause)
+        }
+        else -> {}
+    }
     FlowRow(modifier, mainAxisSpacing = 16.dp, crossAxisSpacing = 16.dp) {
         menus.forEach {
             val painter = painterResource(it.icon)

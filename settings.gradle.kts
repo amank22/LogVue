@@ -9,5 +9,3 @@ rootProject.name = "logvue"
 
 include("api")
 include("app")
-include("plugins")
-include("plugins:pdt")

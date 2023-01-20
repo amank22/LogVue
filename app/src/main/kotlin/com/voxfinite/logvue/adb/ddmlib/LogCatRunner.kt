@@ -49,6 +49,7 @@ class LogCatRunner(
 
     @GuardedBy("this")
     private val mListeners = hashSetOf<LogCatListener2>()
+    private var timeStart = Instant.now()
 
     fun run() {
         // wait while device comes online
@@ -59,6 +60,7 @@ class LogCatRunner(
                 return
             }
         }
+        timeStart = Instant.now()
         try {
             mDevice.executeShellCommand(logcatCommand, mReceiver, 0, TimeUnit.SECONDS)
         } catch (e: TimeoutException) {
@@ -99,6 +101,7 @@ class LogCatRunner(
             val newMessages: List<LogCatMessage2> = mParser.processLogLines(lines, mDevice)
                 .mapNotNull {
                     if (it.header.pid != pid) return@mapNotNull null
+                    if (it.header.timestamp.isBefore(timeStart)) return@mapNotNull null
                     // TODO: com.google.android.gms is used on some(maybe newer) firebase analytics
                     //
                     it.to2()
